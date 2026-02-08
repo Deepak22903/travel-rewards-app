@@ -12,11 +12,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Linking,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
 import { APP_CONFIG } from '../core/constants/config';
 import { STORAGE_KEYS } from '../core/types';
+import { OTHER_APPS } from '../core/constants/otherApps';
 import { 
   requestNotificationPermissions,
   scheduleTestNotification 
@@ -82,6 +84,15 @@ export const SettingsScreen: React.FC = () => {
     Alert.alert('Test Sent', 'You should receive a notification in a few seconds.');
   };
 
+  const handleOpenApp = async (url: string): Promise<void> => {
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert('Not Available', 'This app is not available on your device.');
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Notifications Section */}
@@ -128,38 +139,56 @@ export const SettingsScreen: React.FC = () => {
         )}
       </View>
 
-      {/* About Section */}
+      {/* Other Apps Section - Example */}
+      {/* <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Other apps</Text>
+        
+        <TouchableOpacity 
+          style={styles.appCard}
+          onPress={() => handleOpenApp('https://www.facebook.com/')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.appIcon}>📘</Text>
+          <View style={styles.appInfo}>
+            <Text style={styles.appName}>Facebook</Text>
+            <Text style={styles.appSubtitle}>Travel Rewards</Text>
+          </View>
+        </TouchableOpacity>
+      </View> */}
+
+      {/* Other Apps Section - Cross Promotion */}
+      {/* <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Other apps</Text>
+        
+        {OTHER_APPS.map((app) => (
+          <TouchableOpacity 
+            key={app.id}
+            style={styles.appCard}
+            onPress={() => handleOpenApp(app.url)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.appIcon}>{app.icon}</Text>
+            <View style={styles.appInfo}>
+              <Text style={styles.appName}>{app.name}</Text>
+              <Text style={styles.appSubtitle}>{app.subtitle}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View> */}
+
+      {/* Informations Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
+        <Text style={styles.sectionTitle}>Informations</Text>
         
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>App Version</Text>
+            <Text style={styles.settingLabel}>Version</Text>
             <Text style={styles.settingValue}>{APP_CONFIG.APP_VERSION}</Text>
           </View>
         </View>
 
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>App Name</Text>
-            <Text style={styles.settingValue}>{APP_CONFIG.APP_NAME}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Future Features Placeholder */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>More</Text>
-        
-        <View style={[styles.settingRow, styles.disabledRow]}>
-          <View style={styles.settingInfo}>
-            <Text style={[styles.settingLabel, styles.disabledText]}>
-              Other Apps
-            </Text>
-            <Text style={styles.settingDescription}>
-              Coming soon in v2.0
-            </Text>
-          </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.disclaimerText}>{APP_CONFIG.DISCLAIMER}</Text>
         </View>
       </View>
     </ScrollView>
@@ -215,14 +244,50 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '500',
   },
-  disabledRow: {
-    opacity: 0.6,
-  },
-  disabledText: {
-    color: colors.textLight,
-  },
   arrow: {
     fontSize: typography.sizes.xl,
     color: colors.textSecondary,
+  },
+  appCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...shadows.sm,
+  },
+  appIcon: {
+    fontSize: 40,
+    marginRight: spacing.md,
+  },
+  appInfo: {
+    flex: 1,
+  },
+  appName: {
+    fontSize: typography.sizes.md,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  appSubtitle: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+  },
+  infoBox: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    padding: spacing.md,
+    ...shadows.sm,
+  },
+  disclaimerText: {
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
+    lineHeight: 18,
+    textAlign: 'center',
   },
 });

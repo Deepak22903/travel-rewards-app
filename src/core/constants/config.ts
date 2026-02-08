@@ -31,6 +31,7 @@ export const ENV = isDev ? dev : prod;
 
 export const APP_CONFIG = {
   APP_NAME: 'Travel Rewards',
-  APP_VERSION: '1.0.0',
+  APP_VERSION: '1.3.1',
   SHARE_MESSAGE: 'Check out Travel Rewards app for daily game rewards!',
+  DISCLAIMER: 'Travel Rewards is an independent application and is in no way affiliated with, endorsed, or approved by Magmatic Games LTD or Travel Town',
 };

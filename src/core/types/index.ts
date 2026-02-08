@@ -13,6 +13,7 @@ export interface Reward {
   icon: RewardIconType;
   url: string;
   expired: boolean;
+  claimed?: boolean;  // Track if reward has been claimed
 }
 
 // Grouped Rewards by Date
@@ -49,8 +50,18 @@ export interface SettingsState {
   notificationsEnabled: boolean;
 }
 
+// Other App Interface (for cross-promotion)
+export interface OtherApp {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: string;  // emoji or image
+  url: string;
+}
+
 // AsyncStorage Keys
 export const STORAGE_KEYS = {
   SETTINGS: '@travel_rewards:settings',
   LAST_REFRESH: '@travel_rewards:last_refresh',
+  CLAIMED_REWARDS: '@travel_rewards:claimed_rewards',
 } as const;

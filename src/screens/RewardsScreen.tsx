@@ -13,8 +13,9 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
-import { Reward, RewardSection } from '../core/types';
+import { Reward, RewardSection, STORAGE_KEYS } from '../core/types';
 import { getRewards } from '../core/api/rewards';
 import { ClaimModal } from '../components/ClaimModal';
 import { BannerAd } from '../components/BannerAd';
@@ -29,9 +30,33 @@ export const RewardsScreen: React.FC = () => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [infoMessage, setInfoMessage] = useState<string>('');
+  const [claimedRewards, setClaimedRewards] = useState<Set<string>>(new Set());
   
   // Interstitial ad hook
   const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
+
+  const loadClaimedRewards = async (): Promise<void> => {
+    try {
+      const saved = await AsyncStorage.getItem(STORAGE_KEYS.CLAIMED_REWARDS);
+      if (saved) {
+        const claimed = JSON.parse(saved);
+        setClaimedRewards(new Set(claimed));
+      }
+    } catch (error) {
+      console.error('Error loading claimed rewards:', error);
+    }
+  };
+
+  const saveClaimedRewards = async (claimed: Set<string>): Promise<void> => {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.CLAIMED_REWARDS, 
+        JSON.stringify(Array.from(claimed))
+      );
+    } catch (error) {
+      console.error('Error saving claimed rewards:', error);
+    }
+  };
 
   const fetchRewards = async (): Promise<void> => {
     try {
@@ -39,7 +64,15 @@ export const RewardsScreen: React.FC = () => {
       const response = await getRewards();
       
       if (response.success && response.data) {
-        setSections(response.data);
+        // Mark rewards as claimed based on stored data
+        const updatedSections = response.data.map(section => ({
+          ...section,
+          data: section.data.map(reward => ({
+            ...reward,
+            claimed: claimedRewards.has(reward.id),
+          })),
+        }));
+        setSections(updatedSections);
         setInfoMessage(response.message || '');
       } else {
         setError(response.error || 'Failed to load rewards');
@@ -55,21 +88,43 @@ export const RewardsScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchRewards();
+    loadClaimedRewards();
   }, []);
+
+  useEffect(() => {
+    if (claimedRewards.size >= 0) {
+      fetchRewards();
+    }
+  }, [claimedRewards]);
 
   const handleRefresh = (): void => {
     setRefreshing(true);
-    fetchRewards();
+    loadClaimedRewards().then(() => fetchRewards());
   };
 
   const handleRewardPress = (reward: Reward): void => {
+    // Mark reward as claimed
+    if (!reward.claimed) {
+      const newClaimed = new Set(claimedRewards);
+      newClaimed.add(reward.id);
+      setClaimedRewards(newClaimed);
+      saveClaimedRewards(newClaimed);
+      
+      // Update the reward in sections
+      setSections(prev => prev.map(section => ({
+        ...section,
+        data: section.data.map(r => 
+          r.id === reward.id ? { ...r, claimed: true } : r
+        ),
+      })));
+    }
+    
     // Show interstitial ad when user taps reward card
     if (adLoaded && shouldShowInterstitial()) {
       showInterstitial();
     }
     
-    setSelectedReward(reward);
+    setSelectedReward({ ...reward, claimed: true });
     setModalVisible(true);
   };
 
@@ -85,7 +140,7 @@ export const RewardsScreen: React.FC = () => {
       activeOpacity={0.7}
       accessible={true}
       accessibilityRole="button"
-      accessibilityLabel={`${item.label}${item.expired ? ', expired' : ''}`}
+      accessibilityLabel={`${item.label}${item.claimed ? ', claimed' : ''}${item.expired ? ', expired' : ''}`}
       accessibilityHint="Tap to claim this reward"
       accessibilityState={{ disabled: item.expired }}
     >
@@ -96,6 +151,13 @@ export const RewardsScreen: React.FC = () => {
         <Text style={[styles.rewardLabel, item.expired && styles.textExpired]}>
           {item.label}
         </Text>
+      </View>
+      <View style={styles.statusContainer}>
+        {item.claimed ? (
+          <Text style={styles.claimedIcon}>✓</Text>
+        ) : (
+          <Text style={styles.unclaimedIcon}>☐</Text>
+        )}
       </View>
       {item.expired && (
         <Text style={styles.expiredBadge}>Expired</Text>
@@ -182,7 +244,7 @@ export const RewardsScreen: React.FC = () => {
       />
       
       {/* Banner Ad at bottom */}
-      <BannerAd />
+      {/* <BannerAd /> */}
       
       <ClaimModal
         visible={modalVisible}
@@ -258,6 +320,19 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     fontWeight: '600',
     color: colors.textPrimary,
+    flex: 1,
+  },
+  statusContainer: {
+    marginLeft: spacing.sm,
+  },
+  claimedIcon: {
+    fontSize: 24,
+    color: colors.buttonGreen,
+    fontWeight: 'bold',
+  },
+  unclaimedIcon: {
+    fontSize: 24,
+    color: colors.textSecondary,
   },
   textExpired: {
     color: colors.textLight,
