@@ -103,6 +103,19 @@ export const RewardsScreen: React.FC = () => {
   };
 
   const handleRewardPress = (reward: Reward): void => {
+    // Show interstitial ad when user taps reward card
+    const showAd = async () => {
+      if (adLoaded && await shouldShowInterstitial()) {
+        showInterstitial();
+      }
+    };
+    showAd();
+    
+    setSelectedReward(reward);
+    setModalVisible(true);
+  };
+
+  const handleClaimReward = (reward: Reward): void => {
     // Mark reward as claimed
     if (!reward.claimed) {
       const newClaimed = new Set(claimedRewards);
@@ -117,15 +130,10 @@ export const RewardsScreen: React.FC = () => {
           r.id === reward.id ? { ...r, claimed: true } : r
         ),
       })));
+      
+      // Update selected reward to show claimed status
+      setSelectedReward({ ...reward, claimed: true });
     }
-    
-    // Show interstitial ad when user taps reward card
-    if (adLoaded && shouldShowInterstitial()) {
-      showInterstitial();
-    }
-    
-    setSelectedReward({ ...reward, claimed: true });
-    setModalVisible(true);
   };
 
   const handleCloseModal = (): void => {
@@ -152,13 +160,12 @@ export const RewardsScreen: React.FC = () => {
           {item.label}
         </Text>
       </View>
-      <View style={styles.statusContainer}>
-        {item.claimed ? (
+      {item.claimed && (
+        <View style={styles.statusContainer}>
+          <Text style={styles.claimedBadge}>Claimed</Text>
           <Text style={styles.claimedIcon}>✓</Text>
-        ) : (
-          <Text style={styles.unclaimedIcon}>☐</Text>
-        )}
-      </View>
+        </View>
+      )}
       {item.expired && (
         <Text style={styles.expiredBadge}>Expired</Text>
       )}
@@ -244,12 +251,13 @@ export const RewardsScreen: React.FC = () => {
       />
       
       {/* Banner Ad at bottom */}
-      {/* <BannerAd /> */}
-      
+      <BannerAd />
+
       <ClaimModal
         visible={modalVisible}
         reward={selectedReward}
         onClose={handleCloseModal}
+        onClaim={handleClaimReward}
       />
     </View>
   );
@@ -323,16 +331,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginLeft: spacing.sm,
+    backgroundColor: colors.buttonGreen,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.md,
+    gap: spacing.xs,
+  },
+  claimedBadge: {
+    fontSize: typography.sizes.xs,
+    fontWeight: '600',
+    color: colors.white,
+    textTransform: 'uppercase',
   },
   claimedIcon: {
-    fontSize: 24,
-    color: colors.buttonGreen,
+    fontSize: 16,
+    color: colors.white,
     fontWeight: 'bold',
-  },
-  unclaimedIcon: {
-    fontSize: 24,
-    color: colors.textSecondary,
   },
   textExpired: {
     color: colors.textLight,

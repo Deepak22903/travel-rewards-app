@@ -1,128 +1,102 @@
 /**
  * Interstitial Ad Hook
- * Manages full-screen interstitial advertisements
- * Note: Requires development build - mock implementation for Expo Go
+ * Hook for loading and showing interstitial ads
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { Platform, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
-// AdMob Test IDs
-const INTERSTITIAL_AD_UNIT_ID = Platform.select({
-  ios: 'ca-app-pub-3940256099942544/4411468910',
-  android: 'ca-app-pub-3940256099942544/1033173712',
-  default: 'ca-app-pub-3940256099942544/1033173712',
-});
+let InterstitialAd: any = null;
+let AdEventType: any = null;
+let TestIds: any = null;
 
-interface UseInterstitialAdReturn {
-  isLoaded: boolean;
-  isLoading: boolean;
-  load: () => void;
-  show: () => void;
+try {
+  const GoogleAds = require('react-native-google-mobile-ads');
+  InterstitialAd = GoogleAds.InterstitialAd;
+  AdEventType = GoogleAds.AdEventType;
+  TestIds = GoogleAds.TestIds;
+} catch (e) {
+  console.log('Google Mobile Ads not available (Expo Go)');
 }
 
-export const useInterstitialAd = (): UseInterstitialAdReturn => {
+// Use test ad unit ID
+const adUnitId = __DEV__ && TestIds
+  ? TestIds.INTERSTITIAL
+  : Platform.select({
+      ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy',
+      android: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy',
+    });
+
+// Create interstitial ad instance only if module is available
+let interstitial: any = null;
+if (InterstitialAd && adUnitId) {
+  try {
+    interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+      requestNonPersonalizedAdsOnly: true,
+    });
+  } catch (e) {
+    console.log('Failed to create interstitial ad:', e);
+  }
+}
+
+export const useInterstitialAd = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock implementation for Expo Go
-  // In production with development build, replace with:
-  // import { InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
-
-  const load = useCallback(() => {
-    setIsLoading(true);
-    
-    // Simulate ad loading
-    setTimeout(() => {
+  useEffect(() => {
+    // If no native module, just set as "loaded" for mock behavior
+    if (!interstitial) {
+      console.log('Mock interstitial ad loaded (no native module)');
       setIsLoaded(true);
-      setIsLoading(false);
-      console.log('Mock interstitial ad loaded');
-    }, 1000);
-  }, []);
-
-  const show = useCallback(() => {
-    if (!isLoaded) {
-      console.warn('Interstitial ad not loaded yet');
       return;
     }
 
-    // Mock ad display
-    Alert.alert(
-      '📺 Interstitial Ad',
-      'This would show a full-screen ad in production.\n\nRequires development build with AdMob.',
-      [
-        {
-          text: 'Close',
-          onPress: () => {
-            setIsLoaded(false);
-            // Auto-load next ad
-            load();
-          },
-        },
-      ]
+    const unsubscribeLoaded = interstitial.addAdEventListener(
+      AdEventType.LOADED,
+      () => {
+        setIsLoaded(true);
+        console.log('Interstitial ad loaded');
+      }
     );
-  }, [isLoaded, load]);
 
-  useEffect(() => {
-    // Pre-load ad on mount
-    load();
-  }, [load]);
+    const unsubscribeClosed = interstitial.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        setIsLoaded(false);
+        // Reload the ad
+        interstitial.load();
+      }
+    );
 
-  return {
-    isLoaded,
-    isLoading,
-    load,
-    show,
-  };
+    const unsubscribeError = interstitial.addAdEventListener(
+      AdEventType.ERROR,
+      (error: any) => {
+        console.error('Interstitial ad error:', error);
+        setIsLoaded(false);
+      }
+    );
 
-  /* Production implementation (uncomment when using development build):
-  
-  const [interstitial, setInterstitial] = useState<InterstitialAd | null>(null);
-
-  useEffect(() => {
-    const ad = InterstitialAd.createForAdRequest(INTERSTITIAL_AD_UNIT_ID, {
-      requestNonPersonalizedAdsOnly: false,
-    });
-
-    const unsubscribeLoaded = ad.addAdEventListener(AdEventType.LOADED, () => {
-      setIsLoaded(true);
-      setIsLoading(false);
-    });
-
-    const unsubscribeError = ad.addAdEventListener(AdEventType.ERROR, (error) => {
-      console.error('Interstitial ad error:', error);
-      setIsLoading(false);
-    });
-
-    const unsubscribeClosed = ad.addAdEventListener(AdEventType.CLOSED, () => {
-      setIsLoaded(false);
-      // Load next ad
-      ad.load();
-    });
-
-    setInterstitial(ad);
-    ad.load();
+    // Start loading the ad
+    interstitial.load();
 
     return () => {
       unsubscribeLoaded();
-      unsubscribeError();
       unsubscribeClosed();
+      unsubscribeError();
     };
   }, []);
 
-  const load = useCallback(() => {
-    if (interstitial) {
-      setIsLoading(true);
-      interstitial.load();
+  const show = () => {
+    if (!interstitial) {
+      console.log('Mock interstitial ad shown (no native module)');
+      return;
     }
-  }, [interstitial]);
 
-  const show = useCallback(() => {
-    if (isLoaded && interstitial) {
+    if (isLoaded) {
       interstitial.show();
+    } else {
+      console.log('Interstitial ad not loaded yet');
     }
-  }, [isLoaded, interstitial]);
+  };
 
-  return { isLoaded, isLoading, load, show };
-  */
+  return { isLoaded, show };
 };

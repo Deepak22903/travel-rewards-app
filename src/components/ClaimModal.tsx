@@ -3,7 +3,7 @@
  * Modal for displaying reward details and claim functionality
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,6 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
 import { Reward } from '../core/types';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
 
@@ -22,31 +21,19 @@ interface ClaimModalProps {
   visible: boolean;
   reward: Reward | null;
   onClose: () => void;
+  onClaim: (reward: Reward) => void;
 }
 
-export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async (): Promise<void> => {
-    if (!reward) return;
-
-    try {
-      await Clipboard.setStringAsync(reward.url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error('Failed to copy:', error);
-      Alert.alert('Error', 'Failed to copy link');
-    }
-  };
-
+export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose, onClaim }) => {
   const handleClaim = async (): Promise<void> => {
     if (!reward) return;
 
     try {
-      const supported = await Linking.canOpenURL(reward.url);
+      const supported = await Linking.canOpenURL(reward.code);
       if (supported) {
-        await Linking.openURL(reward.url);
+        // Mark as claimed before opening the link
+        onClaim(reward);
+        await Linking.openURL(reward.code);
         onClose();
       } else {
         Alert.alert('Error', 'Cannot open this link');
@@ -76,23 +63,6 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
             <Text style={styles.title}>{reward.label}</Text>
           </View>
 
-          {/* URL Display */}
-          <View style={styles.urlContainer}>
-            <Text style={styles.urlLabel}>Reward Link:</Text>
-            <View style={styles.urlBox}>
-              <Text style={styles.urlText} numberOfLines={2} ellipsizeMode="middle">
-                {reward.url}
-              </Text>
-            </View>
-          </View>
-
-          {/* Copy Feedback */}
-          {copied && (
-            <View style={styles.copiedBanner}>
-              <Text style={styles.copiedText}>✓ Copied to clipboard!</Text>
-            </View>
-          )}
-
           {/* Expired Warning */}
           {reward.expired && (
             <View style={styles.warningBanner}>
@@ -101,14 +71,13 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
           )}
 
           {/* Action Buttons */}
-          <View style={styles.actions}>
+          <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={[styles.button, styles.copyButton]}
-              onPress={handleCopy}
-              activeOpacity={0.8}
+              style={[styles.button, styles.closeButtonStyle]}
+              onPress={onClose}
+              activeOpacity={0.7}
             >
-              <Text style={styles.buttonIcon}>📋</Text>
-              <Text style={styles.buttonText}>Copy Link</Text>
+              <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -117,18 +86,9 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
               activeOpacity={0.8}
             >
               <Text style={styles.buttonIcon}>🎁</Text>
-              <Text style={[styles.buttonText, styles.claimButtonText]}>Claim Reward</Text>
+              <Text style={[styles.buttonText, styles.claimButtonText]}>Claim</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Close Button */}
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={onClose}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
         </Pressable>
       </Pressable>
     </Modal>
@@ -165,39 +125,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: 'center',
   },
-  urlContainer: {
-    marginBottom: spacing.md,
-  },
-  urlLabel: {
-    fontSize: typography.sizes.sm,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  urlBox: {
-    backgroundColor: colors.backgroundLight,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    padding: spacing.md,
-  },
-  urlText: {
-    fontSize: typography.sizes.sm,
-    color: colors.textPrimary,
-    fontFamily: 'monospace',
-  },
-  copiedBanner: {
-    backgroundColor: colors.success,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    alignItems: 'center',
-  },
-  copiedText: {
-    fontSize: typography.sizes.sm,
-    fontWeight: '600',
-    color: colors.white,
-  },
   warningBanner: {
     backgroundColor: colors.warning,
     borderRadius: borderRadius.md,
@@ -210,10 +137,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.white,
   },
-  actions: {
+  buttonRow: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginBottom: spacing.md,
   },
   button: {
     flex: 1,
@@ -225,7 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     ...shadows.sm,
   },
-  copyButton: {
+  closeButtonStyle: {
     backgroundColor: colors.backgroundLight,
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -244,14 +170,5 @@ const styles = StyleSheet.create({
   },
   claimButtonText: {
     color: colors.white,
-  },
-  closeButton: {
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  closeButtonText: {
-    fontSize: typography.sizes.md,
-    fontWeight: '500',
-    color: colors.textSecondary,
   },
 });

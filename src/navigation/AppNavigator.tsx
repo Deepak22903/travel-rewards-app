@@ -47,7 +47,7 @@ export const AppNavigator: React.FC = () => {
           name="Home" 
           component={HomeScreen}
           options={{
-            title: 'Travel Rewards',
+            headerShown: false,
           }}
         />
         <Stack.Screen 

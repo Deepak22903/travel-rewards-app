@@ -11,16 +11,15 @@ export interface Reward {
   id: string;
   label: string;
   icon: RewardIconType;
-  url: string;
+  code: string;  // Reward claim URL/code
   expired: boolean;
   claimed?: boolean;  // Track if reward has been claimed
 }
 
 // Grouped Rewards by Date
 export interface RewardSection {
-  date: string;        // ISO date format: "2026-02-07"
-  title: string;       // Display format: "February 7"
-  data: Reward[];      // Changed from 'rewards' to 'data' for SectionList compatibility
+  title: string;       // Display format: "Today", "Yesterday", "February 7"
+  data: Reward[];      // Rewards for this section
 }
 
 // API Response Structure
@@ -35,7 +34,7 @@ export interface ApiResponse<T> {
 export interface RewardsApiResponse {
   success: boolean;
   message: string;
-  sections: RewardSection[];
+  data: RewardSection[];
 }
 
 // Navigation Types

@@ -31,9 +31,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     // Show interstitial ad on app launch if conditions are met
-    if (adLoaded && shouldShowInterstitial()) {
-      showInterstitial();
-    }
+    const checkAndShowAd = async () => {
+      if (adLoaded && await shouldShowInterstitial()) {
+        showInterstitial();
+      }
+    };
+    checkAndShowAd();
   }, [adLoaded, showInterstitial]);
 
   const handleShare = async (): Promise<void> => {
@@ -55,17 +58,31 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Logo Section */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>Travel</Text>
-        <Text style={[styles.logoText, styles.logoAccent]}>Rewards</Text>
-      </View>
+      {/* Settings Icon */}
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={() => navigation.navigate('Settings')}
+        activeOpacity={0.7}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Settings"
+        accessibilityHint="Open app settings"
+      >
+        <Text style={styles.settingsIcon}>⚙️</Text>
+      </TouchableOpacity>
 
-      {/* Subtitle */}
-      <Text style={styles.subtitle}>Daily Game Rewards</Text>
+      {/* Center Content */}
+      <View style={styles.centerContent}>
+        {/* Logo Section */}
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoText}>Travel</Text>
+          <Text style={[styles.logoText, styles.logoAccent]}>Rewards</Text>
+        </View>
 
-      {/* Main Actions */}
-      <View style={styles.actionsContainer}>
+        {/* Subtitle */}
+        <Text style={styles.subtitle}>Daily Game Rewards</Text>
+
+        {/* View Rewards Button */}
         <TouchableOpacity
           style={[styles.button, styles.primaryButton]}
           onPress={() => navigation.navigate('Rewards')}
@@ -78,7 +95,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Text style={styles.buttonIcon}>⚡</Text>
           <Text style={styles.buttonText}>View Rewards</Text>
         </TouchableOpacity>
+      </View>
 
+      {/* Bottom Buttons */}
+      <View style={styles.bottomButtons}>
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={[styles.button, styles.secondaryButton]}
@@ -107,19 +127,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Settings Icon */}
-      <TouchableOpacity
-        style={styles.settingsButton}
-        onPress={() => navigation.navigate('Settings')}
-        activeOpacity={0.7}
-        accessible={true}
-        accessibilityRole="button"
-        accessibilityLabel="Settings"
-        accessibilityHint="Open app settings"
-      >
-        <Text style={styles.settingsIcon}>⚙️</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -128,6 +135,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: spacing.xxl,
+    right: spacing.lg,
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.round,
+    backgroundColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.sm,
+    zIndex: 10,
+  },
+  settingsIcon: {
+    fontSize: 24,
+  },
+  centerContent: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.lg,
@@ -150,12 +176,7 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.lg,
     fontWeight: '500',
     color: colors.textSecondary,
-    marginBottom: spacing.xxl,
-  },
-  actionsContainer: {
-    width: '100%',
-    maxWidth: 400,
-    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
   button: {
     flexDirection: 'row',
@@ -168,16 +189,14 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: colors.buttonGreen,
+    width: '100%',
+    maxWidth: 400,
   },
   secondaryButton: {
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
     flex: 1,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
   },
   buttonIcon: {
     fontSize: 24,
@@ -188,19 +207,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textPrimary,
   },
-  settingsButton: {
-    position: 'absolute',
-    top: spacing.lg,
-    right: spacing.lg,
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.sm,
+  bottomButtons: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
+    width: '100%',
   },
-  settingsIcon: {
-    fontSize: 24,
+  buttonRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    maxWidth: 400,
+    width: '100%',
+    alignSelf: 'center',
   },
 });
