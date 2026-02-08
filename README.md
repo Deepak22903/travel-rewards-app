@@ -143,14 +143,16 @@ travel-rewards-app/
 
 ## 📖 Documentation
 
-Comprehensive guides available in the project:
+Comprehensive guides available in the [`docs/`](docs/) directory:
 
-- **[AdMob Setup Guide](ADMOB_SETUP.md)** - Complete AdMob integration instructions
-- **[App Icon Setup](APP_ICON_SETUP.md)** - Icon and splash screen creation
-- **[Notifications Setup](NOTIFICATIONS_SETUP.md)** - Push notification configuration
-- **[Performance Guide](PERFORMANCE.md)** - Optimization strategies
-- **[Testing Guide](TESTING_GUIDE.md)** - Manual testing procedures
-- **[Implementation Plan](ImplementationPlan.md)** - Full project roadmap
+- **[AdMob Setup Guide](docs/ADMOB_SETUP.md)** - Complete AdMob integration instructions
+- **[App Icon Setup](docs/APP_ICON_SETUP.md)** - Icon and splash screen creation
+- **[Notifications Setup](docs/NOTIFICATIONS_SETUP.md)** - Push notification configuration
+- **[Performance Guide](docs/PERFORMANCE.md)** - Optimization strategies
+- **[Testing Guide](docs/TESTING_GUIDE.md)** - Manual testing procedures
+- **[Implementation Plan](docs/ImplementationPlan.md)** - Full project roadmap
+- **[Phase 1 Summary](docs/PHASE1_COMPLETE.md)** - Foundation completion report
+- **[Phase 8 Summary](docs/PHASE8_COMPLETE.md)** - Polish & testing completion report
 
 ## 🧪 Testing
 
@@ -176,7 +178,7 @@ npx expo start --android
 - [ ] Error states (offline mode)
 - [ ] Accessibility (screen reader)
 
-See [TESTING_GUIDE.md](TESTING_GUIDE.md) for comprehensive test cases.
+See [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for comprehensive test cases.
 
 ## 🚀 Deployment
 
@@ -204,7 +206,7 @@ eas build --profile production --platform ios
 # Both platforms
 eas build --profile production --platform all
 ```
-
+docs/
 ### App Store Submission
 See [Phase 9 documentation](ImplementationPlan.md#phase-9-store-submission) for complete store submission guide.
 
@@ -221,12 +223,12 @@ Configure in `src/core/constants/config.ts`:
 1. Create AdMob account
 2. Generate app and ad unit IDs
 3. Update `src/core/ads/adConfig.ts`
-4. See [ADMOB_SETUP.md](ADMOB_SETUP.md) for details
+4. See [docs/ADMOB_SETUP.md](docs/ADMOB_SETUP.md) for details
 
 ### Notifications Setup
 1. Configure Firebase project (for production)
 2. Update `app.json` with notification settings
-3. See [NOTIFICATIONS_SETUP.md](NOTIFICATIONS_SETUP.md) for details
+3. See [docs/NOTIFICATIONS_SETUP.md](docs/NOTIFICATIONS_SETUP.md) for details
 
 ## 📊 Features Status
 
