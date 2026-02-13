@@ -94,7 +94,6 @@ export const HomeScreenNB: React.FC<HomeScreenProps> = ({ navigation }) => {
               size="3xl"
               color="primary.600"
               fontWeight="bold"
-              letterSpacing="tight"
             >
               Travel
             </Heading>
@@ -102,7 +101,6 @@ export const HomeScreenNB: React.FC<HomeScreenProps> = ({ navigation }) => {
               size="3xl"
               color="accent.500"
               fontWeight="bold"
-              letterSpacing="tight"
               mt={-2}
             >
               Rewards
