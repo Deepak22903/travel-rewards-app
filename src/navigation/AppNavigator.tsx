@@ -54,14 +54,14 @@ export const AppNavigator: React.FC = () => {
           name="Rewards" 
           component={RewardsScreen}
           options={{
-            title: 'Daily Rewards',
+            headerShown: false,
           }}
         />
         <Stack.Screen 
           name="Settings" 
           component={SettingsScreen}
           options={{
-            title: 'Settings',
+            headerShown: false,
           }}
         />
       </Stack.Navigator>
