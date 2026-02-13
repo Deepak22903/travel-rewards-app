@@ -7,7 +7,7 @@ import React, { useRef, useEffect } from 'react';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
-import { HomeScreen, RewardsScreen, SettingsScreen } from '../screens/indexNB';
+import { HomeScreen, RewardsScreen, SettingsScreen } from '../screens';
 import { colors, typography } from '../core/constants/theme';
 import { useNotifications } from '../core/notifications/useNotifications';
 import { registerAndroidNotificationChannel } from '../core/notifications/permissions';
