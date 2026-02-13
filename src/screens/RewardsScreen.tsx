@@ -1,9 +1,9 @@
 /**
- * Rewards Screen
- * Displays daily game rewards grouped by date
+ * Rewards Screen - Redesigned to Match Target App
+ * Displays daily game rewards grouped by date with brown header and styled cards
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -22,8 +22,16 @@ import { BannerAd } from '../components/BannerAd';
 import { useInterstitialAd } from '../core/ads/useInterstitialAd';
 import { shouldShowInterstitial } from '../core/ads/adConfig';
 import { logError, logStorageError } from '../core/utils/errorLogger';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../core/types';
 
-export const RewardsScreen: React.FC = () => {
+type RewardsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Rewards'>;
+
+interface RewardsScreenProps {
+  navigation: RewardsScreenNavigationProp;
+}
+
+export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const [sections, setSections] = useState<RewardSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -34,7 +42,6 @@ export const RewardsScreen: React.FC = () => {
   const [claimedRewards, setClaimedRewards] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
   
-  // Interstitial ad hook
   const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
 
   const loadClaimedRewards = async (): Promise<void> => {
@@ -44,7 +51,7 @@ export const RewardsScreen: React.FC = () => {
         const claimed = JSON.parse(saved);
         setClaimedRewards(new Set(claimed));
       }
-      setInitialized(true);  // Mark as initialized after first load
+      setInitialized(true);
     } catch (error) {
       logStorageError(error, 'read', STORAGE_KEYS.CLAIMED_REWARDS);
       setInitialized(true);
@@ -68,7 +75,6 @@ export const RewardsScreen: React.FC = () => {
       const response = await getRewards();
       
       if (response.success && response.data) {
-        // Mark rewards as claimed based on stored data
         const updatedSections = response.data.map(section => ({
           ...section,
           data: section.data.map(reward => ({
@@ -96,11 +102,10 @@ export const RewardsScreen: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Only fetch rewards after claimed rewards are initialized
     if (initialized) {
       fetchRewards();
     }
-  }, [initialized, fetchRewards]);  // Include fetchRewards as dependency
+  }, [initialized, fetchRewards]);
 
   const handleRefresh = useCallback((): void => {
     setRefreshing(true);
@@ -108,7 +113,6 @@ export const RewardsScreen: React.FC = () => {
   }, [fetchRewards]);
 
   const handleRewardPress = useCallback((reward: Reward): void => {
-    // Show interstitial ad when user taps reward card
     const showAd = async () => {
       if (adLoaded && await shouldShowInterstitial()) {
         showInterstitial();
@@ -121,14 +125,12 @@ export const RewardsScreen: React.FC = () => {
   }, [adLoaded, showInterstitial]);
 
   const handleClaimReward = useCallback((reward: Reward): void => {
-    // Mark reward as claimed
     if (!reward.claimed) {
       const newClaimed = new Set(claimedRewards);
       newClaimed.add(reward.id);
       setClaimedRewards(newClaimed);
       saveClaimedRewards(newClaimed);
       
-      // Update the reward in sections
       setSections(prev => prev.map(section => ({
         ...section,
         data: section.data.map(r => 
@@ -136,7 +138,6 @@ export const RewardsScreen: React.FC = () => {
         ),
       })));
       
-      // Update selected reward to show claimed status
       setSelectedReward({ ...reward, claimed: true });
     }
   }, [claimedRewards, saveClaimedRewards]);
@@ -148,122 +149,136 @@ export const RewardsScreen: React.FC = () => {
 
   const renderRewardCard = useCallback(({ item }: { item: Reward }): React.JSX.Element => (
     <TouchableOpacity
-      style={[styles.card, item.expired && styles.cardExpired]}
+      style={[styles.card, item.claimed && styles.cardClaimed]}
       onPress={() => handleRewardPress(item)}
       activeOpacity={0.7}
+      disabled={item.expired}
       accessible={true}
       accessibilityRole="button"
       accessibilityLabel={`${item.label}${item.claimed ? ', claimed' : ''}${item.expired ? ', expired' : ''}`}
       accessibilityHint="Tap to claim this reward"
-      accessibilityState={{ disabled: item.expired }}
     >
       <View style={styles.cardContent}>
         <Text style={styles.rewardIcon}>
           {item.icon === 'energy' ? '⚡' : item.icon === 'coins' ? '🪙' : '💎'}
         </Text>
-        <Text style={[styles.rewardLabel, item.expired && styles.textExpired]}>
+        <Text style={[styles.rewardLabel, item.claimed && styles.textClaimed]}>
           {item.label}
         </Text>
       </View>
-      {item.claimed && (
-        <View style={styles.statusContainer}>
-          <Text style={styles.claimedBadge}>Claimed</Text>
-          <Text style={styles.claimedIcon}>✓</Text>
-        </View>
-      )}
-      {item.expired && (
-        <Text style={styles.expiredBadge}>Expired</Text>
-      )}
+      <View style={[styles.actionIcon, item.claimed && styles.actionIconClaimed]}>
+        <Text style={styles.actionIconText}>{item.claimed ? '✓' : '📥'}</Text>
+      </View>
     </TouchableOpacity>
   ), [handleRewardPress]);
 
   const renderSectionHeader = useCallback(({ section }: { section: RewardSection }): React.JSX.Element => (
-    <View style={styles.sectionHeader}>
+    <View style={styles.sectionHeaderContainer}>
       <Text style={styles.sectionTitle}>{section.title}</Text>
     </View>
   ), []);
 
+  const ListHeaderComponent = useCallback((): React.JSX.Element => (
+    <>
+      <View style={styles.infoBanner}>
+        <Text style={styles.infoBannerText}>
+          Rewards are valid for a few days. If they don't work, they may have expired or already been used on your account.
+        </Text>
+      </View>
+      <BannerAd />
+    </>
+  ), []);
+
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={styles.loadingText}>Loading rewards...</Text>
+      <View style={styles.container}>
+        {/* Custom Header */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Rewards</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={styles.loadingText}>Loading rewards...</Text>
+        </View>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorEmoji}>🔌</Text>
-        <Text style={styles.errorTitle}>Connection Error</Text>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity 
-          style={styles.retryButton} 
-          onPress={fetchRewards}
-          accessible={true}
-          accessibilityRole="button"
-          accessibilityLabel="Try Again"
-          accessibilityHint="Retry loading rewards"
-        >
-          <Text style={styles.retryButtonText}>Try Again</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (sections.length === 0) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.emptyEmoji}>🎁</Text>
-        <Text style={styles.emptyTitle}>No Rewards Yet</Text>
-        <Text style={styles.emptyText}>Check back later for new rewards!</Text>
-        <TouchableOpacity 
-          style={styles.retryButton} 
-          onPress={fetchRewards}
-          accessible={true}
-          accessibilityRole="button"
-          accessibilityLabel="Refresh"
-          accessibilityHint="Check for new rewards"
-        >
-          <Text style={styles.retryButtonText}>Refresh</Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        {/* Custom Header */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Rewards</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorEmoji}>🔌</Text>
+          <Text style={styles.errorTitle}>Connection Error</Text>
+          <Text style={styles.errorMessage}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+            <Text style={styles.retryText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {infoMessage ? (
-        <View style={styles.infoBar}>
-          <Text style={styles.infoText}>{infoMessage}</Text>
-        </View>
-      ) : null}
-      
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Rewards</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
         renderItem={renderRewardCard}
         renderSectionHeader={renderSectionHeader}
+        ListHeaderComponent={ListHeaderComponent}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
             tintColor={colors.accent}
+            colors={[colors.accent]}
           />
         }
+        stickySectionHeadersEnabled={false}
       />
-      
-      {/* Banner Ad at bottom */}
-      <BannerAd />
 
-      <ClaimModal
-        visible={modalVisible}
-        reward={selectedReward}
-        onClose={handleCloseModal}
-        onClaim={handleClaimReward}
-      />
+      {selectedReward && (
+        <ClaimModal
+          visible={modalVisible}
+          reward={selectedReward}
+          onClaim={handleClaimReward}
+          onClose={handleCloseModal}
+        />
+      )}
     </View>
   );
 };
@@ -273,52 +288,77 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  infoBar: {
-    backgroundColor: colors.accent,
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
-  },
-  infoText: {
-    fontSize: typography.sizes.sm,
-    color: colors.white,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  centerContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  listContent: {
-    padding: spacing.md,
-  },
-  sectionHeader: {
-    backgroundColor: colors.background,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-  },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: colors.header,
+    paddingTop: spacing.xl + 10,
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    fontSize: 28,
+    color: colors.textPrimary,
+  },
+  headerTitle: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    color: colors.textPrimary,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  infoBanner: {
+    backgroundColor: colors.header,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  infoBannerText: {
+    fontSize: typography.sizes.sm,
+    color: colors.textHeader,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  listContent: {
+    paddingBottom: spacing.lg,
+  },
+  sectionHeaderContainer: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.bold,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.card,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.xs,
+    padding: spacing.lg,
+    borderRadius: borderRadius.xl,
+    borderWidth: 2,
+    borderColor: colors.cardBorder,
     ...shadows.sm,
   },
-  cardExpired: {
-    opacity: 0.5,
+  cardClaimed: {
+    backgroundColor: colors.claimed,
+    opacity: 0.7,
   },
   cardContent: {
     flexDirection: 'row',
@@ -330,40 +370,32 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   rewardLabel: {
-    fontSize: typography.sizes.md,
-    fontWeight: '600',
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.bold,
     color: colors.textPrimary,
-    flex: 1,
   },
-  statusContainer: {
-    flexDirection: 'row',
+  textClaimed: {
+    color: colors.textSecondary,
+  },
+  actionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: colors.header,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: spacing.sm,
-    backgroundColor: colors.buttonGreen,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.md,
-    gap: spacing.xs,
   },
-  claimedBadge: {
-    fontSize: typography.sizes.xs,
-    fontWeight: '600',
-    color: colors.white,
-    textTransform: 'uppercase',
+  actionIconClaimed: {
+    backgroundColor: colors.backgroundLight,
   },
-  claimedIcon: {
-    fontSize: 16,
-    color: colors.white,
-    fontWeight: 'bold',
+  actionIconText: {
+    fontSize: 20,
   },
-  textExpired: {
-    color: colors.textLight,
-  },
-  expiredBadge: {
-    fontSize: typography.sizes.xs,
-    fontWeight: '600',
-    color: colors.error,
-    textTransform: 'uppercase',
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
   },
   loadingText: {
     marginTop: spacing.md,
@@ -376,43 +408,25 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: typography.sizes.xl,
-    fontWeight: '700',
+    fontWeight: typography.weights.bold,
     color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
-  errorText: {
+  errorMessage: {
     fontSize: typography.sizes.md,
     color: colors.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.xl,
-    lineHeight: 22,
-  },
-  emptyEmoji: {
-    fontSize: 64,
-    marginBottom: spacing.md,
-  },
-  emptyTitle: {
-    fontSize: typography.sizes.xl,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  emptyText: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    backgroundColor: colors.buttonGreen,
+    backgroundColor: colors.accent,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     borderRadius: borderRadius.lg,
-    ...shadows.md,
   },
-  retryButtonText: {
+  retryText: {
     fontSize: typography.sizes.md,
-    fontWeight: '600',
+    fontWeight: typography.weights.semibold,
     color: colors.white,
   },
 });

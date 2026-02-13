@@ -5,33 +5,37 @@
 
 export const colors = {
   // Backgrounds
-  background: '#F5E6D3',       // Warm beige
-  backgroundLight: '#FDF8F3',  // Off-white
+  background: '#E8D4B8',       // Soft beige (target app)
+  backgroundLight: '#FFF9F0',  // Card white
   
   // Cards & Borders
-  card: '#FDF8F3',             // Off-white
-  cardBorder: '#E8D4C4',       // Light brown
+  card: '#FFF9F0',             // Off-white card background
+  cardBorder: '#D4A574',       // Brown borders
   
   // Text
-  textPrimary: '#5D4E37',      // Dark brown
+  textPrimary: '#6B3E26',      // Dark brown (target app)
   textSecondary: '#8B7355',    // Medium brown
   textLight: '#A69478',        // Light brown
+  textHeader: '#2C3E50',       // Navy section headers
   
   // Accent & Actions
   accent: '#F5A623',           // Orange/gold
-  buttonGreen: '#4CAF50',      // Share/rate buttons
+  buttonGreen: '#4CAF50',      // Share button
+  buttonBlue: '#2196F3',       // Rate button
   header: '#D4A574',           // Header bar
   
   // Status
   success: '#4CAF50',
   error: '#E53935',
   warning: '#FFA726',
+  claimed: '#C8C8C8',          // Claimed/grayed state
   
   // Utility
   white: '#FFFFFF',
   black: '#000000',
   transparent: 'transparent',
   overlay: 'rgba(0, 0, 0, 0.5)',
+  shadow: 'rgba(0, 0, 0, 0.1)',
 };
 
 export const spacing = {

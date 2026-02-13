@@ -1,6 +1,6 @@
 /**
- * Home Screen
- * Landing page with logo, navigation, and action buttons
+ * Home Screen - Redesigned to Match Target App
+ * Landing page with gradient logo, card buttons, and game-like aesthetic
  */
 
 import React, { useEffect } from 'react';
@@ -9,9 +9,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Share,
   Platform,
   Linking,
+  Share as RNShare,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
@@ -30,7 +30,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
 
   useEffect(() => {
-    // Show interstitial ad on app launch if conditions are met
     const checkAndShowAd = async () => {
       if (adLoaded && await shouldShowInterstitial()) {
         showInterstitial();
@@ -42,7 +41,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const handleShare = async (): Promise<void> => {
     try {
       const storeUrl = Platform.OS === 'ios' ? ENV.APP_STORE_URL : ENV.PLAY_STORE_URL;
-      await Share.share({
+      await RNShare.share({
         message: `${APP_CONFIG.SHARE_MESSAGE}\n\n${storeUrl}`,
         title: APP_CONFIG.APP_NAME,
       });
@@ -53,7 +52,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const handleRate = (): void => {
     const storeUrl = Platform.OS === 'ios' ? ENV.APP_STORE_URL : ENV.PLAY_STORE_URL;
-    Linking.openURL(storeUrl).catch(err => console.error('Error opening store:', err));
+    Linking.openURL(storeUrl).catch(err => {
+      console.error('Error opening store:', err);
+    });
   };
 
   return (
@@ -62,9 +63,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <TouchableOpacity
         style={styles.settingsButton}
         onPress={() => navigation.navigate('Settings')}
-        activeOpacity={0.7}
-        accessible={true}
-        accessibilityRole="button"
         accessibilityLabel="Settings"
         accessibilityHint="Open app settings"
       >
@@ -73,59 +71,49 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
       {/* Center Content */}
       <View style={styles.centerContent}>
-        {/* Logo Section */}
+        {/* Logo Section with Gradient-Style Text */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>Travel</Text>
-          <Text style={[styles.logoText, styles.logoAccent]}>Rewards</Text>
+          <Text style={styles.logoTravel}>Travel</Text>
+          <Text style={styles.logoRewards}>Rewards</Text>
         </View>
 
-        {/* Subtitle */}
-        <Text style={styles.subtitle}>Daily Game Rewards</Text>
-
-        {/* View Rewards Button */}
+        {/* Main Rewards Button */}
         <TouchableOpacity
-          style={[styles.button, styles.primaryButton]}
+          style={styles.rewardsButton}
           onPress={() => navigation.navigate('Rewards')}
-          activeOpacity={0.8}
-          accessible={true}
-          accessibilityRole="button"
           accessibilityLabel="View Rewards"
-          accessibilityHint="Navigate to see available daily rewards"
+          accessibilityHint="Open rewards list"
         >
-          <Text style={styles.buttonIcon}>⚡</Text>
-          <Text style={styles.buttonText}>View Rewards</Text>
+          <Text style={styles.rewardsIcon}>⚡</Text>
+          <Text style={styles.rewardsText}>Rewards</Text>
         </TouchableOpacity>
       </View>
 
       {/* Bottom Buttons */}
-      <View style={styles.bottomButtons}>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={handleShare}
-            activeOpacity={0.8}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Share App"
-            accessibilityHint="Share this app with friends"
-          >
-            <Text style={styles.buttonIcon}>📤</Text>
-            <Text style={styles.buttonText}>Share App</Text>
-          </TouchableOpacity>
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={handleShare}
+          accessibilityLabel="Share App"
+          accessibilityHint="Share this app with others"
+        >
+          <View style={styles.shareIconContainer}>
+            <Text style={styles.actionIcon}>📤</Text>
+          </View>
+          <Text style={styles.actionText}>Share</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={handleRate}
-            activeOpacity={0.8}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Rate Us"
-            accessibilityHint="Rate the app in the app store"
-          >
-            <Text style={styles.buttonIcon}>⭐</Text>
-            <Text style={styles.buttonText}>Rate Us</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={handleRate}
+          accessibilityLabel="Rate App"
+          accessibilityHint="Rate this app in the store"
+        >
+          <View style={styles.rateIconContainer}>
+            <Text style={styles.actionIcon}>👍</Text>
+          </View>
+          <Text style={styles.actionText}>Rate</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -138,85 +126,117 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     position: 'absolute',
-    top: spacing.xxl,
-    right: spacing.lg,
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.card,
-    alignItems: 'center',
+    top: spacing.xl + 10,
+    right: spacing.md,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: colors.backgroundLight,
     justifyContent: 'center',
-    ...shadows.sm,
+    alignItems: 'center',
     zIndex: 10,
+    ...shadows.sm,
   },
   settingsIcon: {
-    fontSize: 24,
+    fontSize: 28,
   },
   centerContent: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.lg,
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.xxl,
   },
-  logoText: {
-    fontSize: 56,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -1,
-  },
-  logoAccent: {
+  logoTravel: {
+    fontSize: 64,
+    fontWeight: '800',
     color: colors.accent,
-    marginTop: -spacing.sm,
+    textShadowColor: 'rgba(245, 166, 35, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: -2,
   },
-  subtitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: '500',
-    color: colors.textSecondary,
-    marginBottom: spacing.xl,
+  logoRewards: {
+    fontSize: 64,
+    fontWeight: '800',
+    color: colors.buttonBlue,
+    textShadowColor: 'rgba(33, 150, 243, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: -2,
+    marginTop: -8,
   },
-  button: {
+  rewardsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.card,
     paddingVertical: spacing.lg,
     paddingHorizontal: spacing.xl,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
+    borderWidth: 3,
+    borderColor: colors.cardBorder,
+    width: '100%',
+    maxWidth: 400,
     ...shadows.md,
   },
-  primaryButton: {
-    backgroundColor: colors.buttonGreen,
-    width: '100%',
-    maxWidth: 400,
+  rewardsIcon: {
+    fontSize: 32,
+    marginRight: spacing.md,
   },
-  secondaryButton: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    flex: 1,
-  },
-  buttonIcon: {
-    fontSize: 24,
-    marginRight: spacing.sm,
-  },
-  buttonText: {
-    fontSize: typography.sizes.md,
-    fontWeight: '600',
+  rewardsText: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
     color: colors.textPrimary,
   },
-  bottomButtons: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
-    width: '100%',
-  },
-  buttonRow: {
+  bottomContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
     gap: spacing.md,
-    maxWidth: 400,
-    width: '100%',
-    alignSelf: 'center',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.xl,
+    borderWidth: 3,
+    borderColor: colors.cardBorder,
+    flex: 1,
+    maxWidth: 180,
+    ...shadows.sm,
+  },
+  shareIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: colors.buttonGreen,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  rateIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: colors.buttonBlue,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  actionIcon: {
+    fontSize: 18,
+  },
+  actionText: {
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.semibold,
+    color: colors.textPrimary,
   },
 });
