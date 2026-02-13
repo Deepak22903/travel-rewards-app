@@ -3,7 +3,7 @@
  * Displays daily game rewards grouped by date
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import { ClaimModal } from '../components/ClaimModal';
 import { BannerAd } from '../components/BannerAd';
 import { useInterstitialAd } from '../core/ads/useInterstitialAd';
 import { shouldShowInterstitial } from '../core/ads/adConfig';
+import { logError, logStorageError } from '../core/utils/errorLogger';
 
 export const RewardsScreen: React.FC = () => {
   const [sections, setSections] = useState<RewardSection[]>([]);
@@ -45,23 +46,23 @@ export const RewardsScreen: React.FC = () => {
       }
       setInitialized(true);  // Mark as initialized after first load
     } catch (error) {
-      console.error('Error loading claimed rewards:', error);
+      logStorageError(error, 'read', STORAGE_KEYS.CLAIMED_REWARDS);
       setInitialized(true);
     }
   };
 
-  const saveClaimedRewards = async (claimed: Set<string>): Promise<void> => {
+  const saveClaimedRewards = useCallback(async (claimed: Set<string>): Promise<void> => {
     try {
       await AsyncStorage.setItem(
         STORAGE_KEYS.CLAIMED_REWARDS, 
         JSON.stringify(Array.from(claimed))
       );
     } catch (error) {
-      console.error('Error saving claimed rewards:', error);
+      logStorageError(error, 'write', STORAGE_KEYS.CLAIMED_REWARDS);
     }
-  };
+  }, []);
 
-  const fetchRewards = async (): Promise<void> => {
+  const fetchRewards = useCallback(async (): Promise<void> => {
     try {
       setError(null);
       const response = await getRewards();
@@ -83,12 +84,12 @@ export const RewardsScreen: React.FC = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
-      console.error('Fetch rewards error:', err);
+      logError(err, { screen: 'Rewards', action: 'fetchRewards' });
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [claimedRewards]);
 
   useEffect(() => {
     loadClaimedRewards();
@@ -99,14 +100,14 @@ export const RewardsScreen: React.FC = () => {
     if (initialized) {
       fetchRewards();
     }
-  }, [initialized]);  // Fetch when initialization is complete
+  }, [initialized, fetchRewards]);  // Include fetchRewards as dependency
 
-  const handleRefresh = (): void => {
+  const handleRefresh = useCallback((): void => {
     setRefreshing(true);
     loadClaimedRewards().then(() => fetchRewards());
-  };
+  }, [fetchRewards]);
 
-  const handleRewardPress = (reward: Reward): void => {
+  const handleRewardPress = useCallback((reward: Reward): void => {
     // Show interstitial ad when user taps reward card
     const showAd = async () => {
       if (adLoaded && await shouldShowInterstitial()) {
@@ -117,9 +118,9 @@ export const RewardsScreen: React.FC = () => {
     
     setSelectedReward(reward);
     setModalVisible(true);
-  };
+  }, [adLoaded, showInterstitial]);
 
-  const handleClaimReward = (reward: Reward): void => {
+  const handleClaimReward = useCallback((reward: Reward): void => {
     // Mark reward as claimed
     if (!reward.claimed) {
       const newClaimed = new Set(claimedRewards);
@@ -138,14 +139,14 @@ export const RewardsScreen: React.FC = () => {
       // Update selected reward to show claimed status
       setSelectedReward({ ...reward, claimed: true });
     }
-  };
+  }, [claimedRewards, saveClaimedRewards]);
 
-  const handleCloseModal = (): void => {
+  const handleCloseModal = useCallback((): void => {
     setModalVisible(false);
     setSelectedReward(null);
-  };
+  }, []);
 
-  const renderRewardCard = ({ item }: { item: Reward }): React.JSX.Element => (
+  const renderRewardCard = useCallback(({ item }: { item: Reward }): React.JSX.Element => (
     <TouchableOpacity
       style={[styles.card, item.expired && styles.cardExpired]}
       onPress={() => handleRewardPress(item)}
@@ -174,13 +175,13 @@ export const RewardsScreen: React.FC = () => {
         <Text style={styles.expiredBadge}>Expired</Text>
       )}
     </TouchableOpacity>
-  );
+  ), [handleRewardPress]);
 
-  const renderSectionHeader = ({ section }: { section: RewardSection }): React.JSX.Element => (
+  const renderSectionHeader = useCallback(({ section }: { section: RewardSection }): React.JSX.Element => (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{section.title}</Text>
     </View>
-  );
+  ), []);
 
   if (loading) {
     return (

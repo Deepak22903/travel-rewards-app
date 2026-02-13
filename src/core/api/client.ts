@@ -6,6 +6,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { ENV } from '../constants/config';
 import { RewardsApiResponse } from '../types';
+import { logAPIError } from '../utils/errorLogger';
 
 // Mock data for development (when backend is unavailable)
 const MOCK_REWARDS: RewardsApiResponse = {
@@ -106,6 +107,13 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
+    // Log the error with context
+    logAPIError(
+      error,
+      error.config?.url || 'unknown',
+      error.config?.method?.toUpperCase() || 'GET'
+    );
+
     // In development, return mock data if API fails (for testing without backend)
     if (__DEV__ && error.config?.url?.includes('/rewards')) {
       console.warn('⚠️  API unavailable, using mock data for development');
