@@ -31,6 +31,7 @@ export const RewardsScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [infoMessage, setInfoMessage] = useState<string>('');
   const [claimedRewards, setClaimedRewards] = useState<Set<string>>(new Set());
+  const [initialized, setInitialized] = useState(false);
   
   // Interstitial ad hook
   const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
@@ -42,8 +43,10 @@ export const RewardsScreen: React.FC = () => {
         const claimed = JSON.parse(saved);
         setClaimedRewards(new Set(claimed));
       }
+      setInitialized(true);  // Mark as initialized after first load
     } catch (error) {
       console.error('Error loading claimed rewards:', error);
+      setInitialized(true);
     }
   };
 
@@ -92,10 +95,11 @@ export const RewardsScreen: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (claimedRewards.size >= 0) {
+    // Only fetch rewards after claimed rewards are initialized
+    if (initialized) {
       fetchRewards();
     }
-  }, [claimedRewards]);
+  }, [initialized]);  // Fetch when initialization is complete
 
   const handleRefresh = (): void => {
     setRefreshing(true);

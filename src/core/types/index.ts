@@ -11,7 +11,7 @@ export interface Reward {
   id: string;
   label: string;
   icon: RewardIconType;
-  code: string;  // Reward claim URL/code
+  url: string;  // Reward claim URL (renamed from 'code' for consistency)
   expired: boolean;
   claimed?: boolean;  // Track if reward has been claimed
 }
