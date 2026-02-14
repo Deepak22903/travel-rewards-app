@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
@@ -159,15 +160,24 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       accessibilityHint="Tap to claim this reward"
     >
       <View style={styles.cardContent}>
-        <Text style={styles.rewardIcon}>
-          {item.icon === 'energy' ? '⚡' : item.icon === 'coins' ? '🪙' : '💎'}
-        </Text>
+        <Image 
+          source={require('../../assets/icons8-lightning-100.png')} 
+          style={styles.rewardIcon}
+          resizeMode="contain"
+        />
         <Text style={[styles.rewardLabel, item.claimed && styles.textClaimed]}>
           {item.label}
         </Text>
       </View>
       <View style={[styles.actionIcon, item.claimed && styles.actionIconClaimed]}>
-        <Text style={styles.actionIconText}>{item.claimed ? '✓' : '📥'}</Text>
+        <Image 
+          source={item.claimed 
+            ? require('../../assets/icons8-checkbox-100.png')
+            : require('../../assets/icons8-unchecked-checkbox-100.png')
+          } 
+          style={styles.actionIconImage}
+          resizeMode="contain"
+        />
       </View>
     </TouchableOpacity>
   ), [handleRewardPress]);
@@ -366,7 +376,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   rewardIcon: {
-    fontSize: 32,
+    width: 32,
+    height: 32,
     marginRight: spacing.md,
   },
   rewardLabel: {
@@ -388,8 +399,9 @@ const styles = StyleSheet.create({
   actionIconClaimed: {
     backgroundColor: colors.backgroundLight,
   },
-  actionIconText: {
-    fontSize: 20,
+  actionIconImage: {
+    width: 24,
+    height: 24,
   },
   centerContainer: {
     flex: 1,

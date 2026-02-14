@@ -1,6 +1,6 @@
 /**
  * Home Screen - Redesigned to Match Target App
- * Landing page with gradient logo, card buttons, and game-like aesthetic
+ * Landing page with logo image, icon buttons, and game-like aesthetic
  */
 
 import React, { useEffect } from 'react';
@@ -12,6 +12,7 @@ import {
   Platform,
   Linking,
   Share as RNShare,
+  Image,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
@@ -66,15 +67,22 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         accessibilityLabel="Settings"
         accessibilityHint="Open app settings"
       >
-        <Text style={styles.settingsIcon}>⚙️</Text>
+        <Image 
+          source={require('../../assets/icons8-settings-100.png')} 
+          style={styles.settingsIconImage}
+          resizeMode="contain"
+        />
       </TouchableOpacity>
 
       {/* Center Content */}
       <View style={styles.centerContent}>
-        {/* Logo Section with Gradient-Style Text */}
+        {/* Logo Image */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoTravel}>Travel</Text>
-          <Text style={styles.logoRewards}>Rewards</Text>
+          <Image 
+            source={require('../../assets/homeScreenImg.png')} 
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
 
         {/* Main Rewards Button */}
@@ -84,7 +92,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityLabel="View Rewards"
           accessibilityHint="Open rewards list"
         >
-          <Text style={styles.rewardsIcon}>⚡</Text>
+          <Image 
+            source={require('../../assets/icons8-lightning-100.png')} 
+            style={styles.buttonIcon}
+            resizeMode="contain"
+          />
           <Text style={styles.rewardsText}>Rewards</Text>
         </TouchableOpacity>
       </View>
@@ -98,7 +110,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityHint="Share this app with others"
         >
           <View style={styles.shareIconContainer}>
-            <Text style={styles.actionIcon}>📤</Text>
+            <Image 
+              source={require('../../assets/icons8-share-100.png')} 
+              style={styles.actionIconImage}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.actionText}>Share</Text>
         </TouchableOpacity>
@@ -110,7 +126,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityHint="Rate this app in the store"
         >
           <View style={styles.rateIconContainer}>
-            <Text style={styles.actionIcon}>👍</Text>
+            <Image 
+              source={require('../../assets/icons8-rating-100.png')} 
+              style={styles.actionIconImage}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.actionText}>Rate</Text>
         </TouchableOpacity>
@@ -137,8 +157,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
     ...shadows.sm,
   },
-  settingsIcon: {
-    fontSize: 28,
+  settingsIconImage: {
+    width: 28,
+    height: 28,
   },
   centerContent: {
     flex: 1,
@@ -148,26 +169,11 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.xl,
   },
-  logoTravel: {
-    fontSize: 64,
-    fontWeight: '800',
-    color: colors.accent,
-    textShadowColor: 'rgba(245, 166, 35, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-    letterSpacing: -2,
-  },
-  logoRewards: {
-    fontSize: 64,
-    fontWeight: '800',
-    color: colors.buttonBlue,
-    textShadowColor: 'rgba(33, 150, 243, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-    letterSpacing: -2,
-    marginTop: -8,
+  logoImage: {
+    width: 300,
+    height: 200,
   },
   rewardsButton: {
     flexDirection: 'row',
@@ -183,8 +189,9 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     ...shadows.md,
   },
-  rewardsIcon: {
-    fontSize: 32,
+  buttonIcon: {
+    width: 32,
+    height: 32,
     marginRight: spacing.md,
   },
   rewardsText: {
@@ -231,8 +238,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: spacing.sm,
   },
-  actionIcon: {
-    fontSize: 18,
+  actionIconImage: {
+    width: 20,
+    height: 20,
+    tintColor: colors.white,
   },
   actionText: {
     fontSize: typography.sizes.md,

@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Switch,
   Linking,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
@@ -82,7 +83,11 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         <Text style={styles.sectionHeader}>Notifications</Text>
         <View style={styles.card}>
           <View style={styles.settingRow}>
-            <Text style={styles.iconLarge}>⚡</Text>
+            <Image 
+              source={require('../../assets/icons8-lightning-100.png')} 
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
             <Text style={styles.settingLabel}>New rewards</Text>
             <Switch
               value={notificationsEnabled}
@@ -238,6 +243,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  iconImage: {
+    width: 28,
+    height: 28,
+    marginRight: spacing.md,
   },
   iconLarge: {
     fontSize: 32,
