@@ -64,20 +64,6 @@ jest.mock('expo-notifications', () => ({
 //   },
 // }));
 
-// Mock NativeBase useToast
-jest.mock('native-base', () => {
-  const actual = jest.requireActual('native-base');
-  return {
-    ...actual,
-    useToast: () => ({
-      show: jest.fn(),
-      close: jest.fn(),
-      closeAll: jest.fn(),
-      isActive: jest.fn(() => false),
-    }),
-  };
-});
-
 // Suppress console warnings in tests
 global.console = {
   ...console,
