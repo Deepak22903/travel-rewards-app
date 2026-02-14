@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   settingsIconImage: {
-    width: 28,
-    height: 28,
+    width: 38,
+    height: 38,
   },
   centerContent: {
     flex: 1,
