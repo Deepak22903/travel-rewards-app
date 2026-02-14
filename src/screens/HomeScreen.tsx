@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   rewardsText: {
     fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textPrimary,
   },
   bottomContainer: {
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
+    fontFamily: typography.family.semibold,
     color: colors.textPrimary,
   },
 });

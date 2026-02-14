@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textPrimary,
   },
   headerSpacer: {
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textPrimary,
     textAlign: 'center',
   },
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   },
   rewardLabel: {
     fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textPrimary,
   },
   textClaimed: {
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
+    fontFamily: typography.family.semibold,
     color: colors.white,
   },
 });

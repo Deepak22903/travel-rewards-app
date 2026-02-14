@@ -47,6 +47,8 @@ export const spacing = {
   xxl: 48,
 };
 
+import { fontFamily } from './fonts';
+
 export const typography = {
   sizes: {
     xs: 12,
@@ -62,6 +64,7 @@ export const typography = {
     semibold: '600',
     bold: '700',
   },
+  family: fontFamily,
 } as const;
 
 export const borderRadius = {

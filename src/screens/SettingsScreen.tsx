@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textPrimary,
   },
   headerSpacer: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold,
+    fontFamily: typography.family.bold,
     color: colors.textHeader,
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   gameTitle: {
     fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold,
+    fontFamily: typography.family.semibold,
     color: colors.textPrimary,
     marginBottom: 2,
   },
