@@ -160,11 +160,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       accessibilityHint="Tap to claim this reward"
     >
       <View style={styles.cardContent}>
-        <Image 
-          source={require('../../assets/icons8-lightning-100.png')} 
-          style={styles.rewardIcon}
-          resizeMode="contain"
-        />
+        <Text style={styles.rewardIcon}>⚡</Text>
         <Text style={[styles.rewardLabel, item.claimed && styles.textClaimed]}>
           {item.label}
         </Text>
@@ -376,8 +372,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   rewardIcon: {
-    width: 32,
-    height: 32,
+    fontSize: 32,
     marginRight: spacing.md,
   },
   rewardLabel: {

@@ -83,11 +83,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         <Text style={styles.sectionHeader}>Notifications</Text>
         <View style={styles.card}>
           <View style={styles.settingRow}>
-            <Image 
-              source={require('../../assets/icons8-lightning-100.png')} 
-              style={styles.iconImage}
-              resizeMode="contain"
-            />
+            <Text style={styles.iconLarge}>⚡</Text>
             <Text style={styles.settingLabel}>New rewards</Text>
             <Switch
               value={notificationsEnabled}

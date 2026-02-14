@@ -92,11 +92,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityLabel="View Rewards"
           accessibilityHint="Open rewards list"
         >
-          <Image 
-            source={require('../../assets/icons8-lightning-100.png')} 
-            style={styles.buttonIcon}
-            resizeMode="contain"
-          />
+          <Text style={styles.buttonIcon}>⚡</Text>
           <Text style={styles.rewardsText}>Rewards</Text>
         </TouchableOpacity>
       </View>
@@ -190,8 +186,7 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
   buttonIcon: {
-    width: 32,
-    height: 32,
+    fontSize: 32,
     marginRight: spacing.md,
   },
   rewardsText: {
