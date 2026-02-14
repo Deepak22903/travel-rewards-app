@@ -166,11 +166,11 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
         </Text>
       </View>
       <View style={[styles.actionIcon, item.claimed && styles.actionIconClaimed]}>
-        <Image 
-          source={item.claimed 
+        <Image
+          source={item.claimed
             ? require('../../assets/icons8-checkbox-100.png')
             : require('../../assets/icons8-unchecked-checkbox-100.png')
-          } 
+          }
           style={styles.actionIconImage}
           resizeMode="contain"
         />
@@ -391,9 +391,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  actionIconClaimed: {
-    backgroundColor: colors.backgroundLight,
-  },
+  // actionIconClaimed: {
+  //   backgroundColor: colors.backgroundLight,
+  // },
   actionIconImage: {
     width: 24,
     height: 24,

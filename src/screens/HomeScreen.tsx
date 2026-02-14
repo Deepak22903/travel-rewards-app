@@ -67,8 +67,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         accessibilityLabel="Settings"
         accessibilityHint="Open app settings"
       >
-        <Image 
-          source={require('../../assets/icons8-settings-100.png')} 
+        <Image
+          source={require('../../assets/icons8-settings-100.png')}
           style={styles.settingsIconImage}
           resizeMode="contain"
         />
@@ -78,8 +78,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <View style={styles.centerContent}>
         {/* Logo Image */}
         <View style={styles.logoContainer}>
-          <Image 
-            source={require('../../assets/homeScreenImg.png')} 
+          <Image
+            source={require('../../assets/homeScreenImg.png')}
             style={styles.logoImage}
             resizeMode="contain"
           />
@@ -106,8 +106,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityHint="Share this app with others"
         >
           <View style={styles.shareIconContainer}>
-            <Image 
-              source={require('../../assets/icons8-share-100.png')} 
+            <Image
+              source={require('../../assets/icons8-share-100.png')}
               style={styles.actionIconImage}
               resizeMode="contain"
             />
@@ -122,8 +122,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityHint="Rate this app in the store"
         >
           <View style={styles.rateIconContainer}>
-            <Image 
-              source={require('../../assets/icons8-rating-100.png')} 
+            <Image
+              source={require('../../assets/icons8-rating-100.png')}
               style={styles.actionIconImage}
               resizeMode="contain"
             />
@@ -168,8 +168,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   logoImage: {
-    width: 300,
-    height: 200,
+    width: 400,
+    height: 300,
   },
   rewardsButton: {
     flexDirection: 'row',
