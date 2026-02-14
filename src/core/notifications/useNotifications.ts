@@ -1,13 +1,13 @@
 /**
  * Notification Listeners Hook
- * Handle notification events, navigation, and token registration
+ * Handle FCM notification events, navigation, and token registration
  */
 
 import { useEffect, useRef } from 'react';
-import * as Notifications from 'expo-notifications';
 import { NavigationContainerRef } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { registerPushToken } from '../api/notifications';
+import { setupFCMListeners } from './firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TOKEN_REGISTERED_KEY = '@notification_token_registered';
@@ -15,8 +15,7 @@ const TOKEN_REGISTERED_KEY = '@notification_token_registered';
 export const useNotifications = (
   navigationRef: React.RefObject<NavigationContainerRef<RootStackParamList> | null>
 ) => {
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     // Register token on app start (if not already registered)
@@ -28,7 +27,7 @@ export const useNotifications = (
           const success = await registerPushToken();
           if (success) {
             await AsyncStorage.setItem(TOKEN_REGISTERED_KEY, 'true');
-            console.log('✅ Push token registered with backend');
+            console.log('✅ FCM token registered with backend');
           }
         }
       } catch (error) {
@@ -38,29 +37,22 @@ export const useNotifications = (
 
     registerToken();
 
-    // Listen for notifications received while app is open
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification received:', notification);
-      // You can show an in-app banner here if needed
-    });
-
-    // Listen for user tapping on notification
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('Notification tapped:', response);
+    // Setup FCM listeners
+    const cleanup = setupFCMListeners((notification) => {
+      console.log('Foreground notification received:', notification);
       
       // Navigate based on notification data
-      const screen = response.notification.request.content.data?.screen;
+      const screen = notification.data?.screen;
       if (screen && navigationRef.current) {
         navigationRef.current.navigate(screen as keyof RootStackParamList);
       }
     });
 
+    cleanupRef.current = cleanup;
+
     return () => {
-      if (notificationListener.current) {
-        notificationListener.current.remove();
-      }
-      if (responseListener.current) {
-        responseListener.current.remove();
+      if (cleanupRef.current) {
+        cleanupRef.current();
       }
     };
   }, [navigationRef]);
