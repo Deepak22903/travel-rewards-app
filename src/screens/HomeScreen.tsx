@@ -105,13 +105,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityLabel="Share App"
           accessibilityHint="Share this app with others"
         >
-          <View style={styles.shareIconContainer}>
-            <Image
-              source={require('../../assets/icons8-share-100.png')}
-              style={styles.actionIconImage}
-              resizeMode="contain"
-            />
-          </View>
+          <Image
+            source={require('../../assets/icons8-share-100.png')}
+            style={styles.actionIconImage}
+            resizeMode="contain"
+          />
           <Text style={styles.actionText}>Share</Text>
         </TouchableOpacity>
 
@@ -121,13 +119,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityLabel="Rate App"
           accessibilityHint="Rate this app in the store"
         >
-          <View style={styles.rateIconContainer}>
-            <Image
-              source={require('../../assets/icons8-rating-100.png')}
-              style={styles.actionIconImage}
-              resizeMode="contain"
-            />
-          </View>
+          <Image
+            source={require('../../assets/icons8-rating-100.png')}
+            style={styles.actionIconImage}
+            resizeMode="contain"
+          />
           <Text style={styles.actionText}>Rate</Text>
         </TouchableOpacity>
       </View>
@@ -215,28 +211,10 @@ const styles = StyleSheet.create({
     maxWidth: 180,
     ...shadows.sm,
   },
-  shareIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: colors.buttonGreen,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  },
-  rateIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: colors.buttonBlue,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  },
   actionIconImage: {
-    width: 20,
-    height: 20,
-    tintColor: colors.white,
+    width: 28,
+    height: 28,
+    marginRight: spacing.sm,
   },
   actionText: {
     fontSize: typography.sizes.md,
