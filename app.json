@@ -42,16 +42,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#F5A623",
-          "defaultChannel": "default"
-        }
-      ],
       "expo-font",
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      [
+        "@react-native-firebase/messaging",
+        {
+          "default_notification_channel_id": "default"
+        }
+      ]
     ],
     "extra": {
       "eas": {
