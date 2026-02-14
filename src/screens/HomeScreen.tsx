@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     position: 'absolute',
-    top: spacing.xl + 10,
+    top: spacing.xl + 20,
     right: spacing.md,
     width: 50,
     height: 50,

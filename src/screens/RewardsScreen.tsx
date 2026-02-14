@@ -41,7 +41,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const [infoMessage, setInfoMessage] = useState<string>('');
   const [claimedRewards, setClaimedRewards] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
-  
+
   const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
 
   const loadClaimedRewards = async (): Promise<void> => {
@@ -61,7 +61,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const saveClaimedRewards = useCallback(async (claimed: Set<string>): Promise<void> => {
     try {
       await AsyncStorage.setItem(
-        STORAGE_KEYS.CLAIMED_REWARDS, 
+        STORAGE_KEYS.CLAIMED_REWARDS,
         JSON.stringify(Array.from(claimed))
       );
     } catch (error) {
@@ -73,7 +73,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
     try {
       setError(null);
       const response = await getRewards();
-      
+
       if (response.success && response.data) {
         const updatedSections = response.data.map(section => ({
           ...section,
@@ -119,7 +119,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       }
     };
     showAd();
-    
+
     setSelectedReward(reward);
     setModalVisible(true);
   }, [adLoaded, showInterstitial]);
@@ -130,14 +130,14 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       newClaimed.add(reward.id);
       setClaimedRewards(newClaimed);
       saveClaimedRewards(newClaimed);
-      
+
       setSections(prev => prev.map(section => ({
         ...section,
-        data: section.data.map(r => 
+        data: section.data.map(r =>
           r.id === reward.id ? { ...r, claimed: true } : r
         ),
       })));
-      
+
       setSelectedReward({ ...reward, claimed: true });
     }
   }, [claimedRewards, saveClaimedRewards]);
@@ -194,7 +194,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       <View style={styles.container}>
         {/* Custom Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
@@ -203,7 +203,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
           <Text style={styles.headerTitle}>Rewards</Text>
           <View style={styles.headerSpacer} />
         </View>
-        
+
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>Loading rewards...</Text>
@@ -217,7 +217,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       <View style={styles.container}>
         {/* Custom Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
@@ -226,7 +226,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
           <Text style={styles.headerTitle}>Rewards</Text>
           <View style={styles.headerSpacer} />
         </View>
-        
+
         <View style={styles.centerContainer}>
           <Text style={styles.errorEmoji}>🔌</Text>
           <Text style={styles.errorTitle}>Connection Error</Text>
@@ -243,7 +243,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       {/* Custom Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.header,
-    paddingTop: spacing.xl + 10,
+    paddingTop: spacing.xl + 20,
     paddingBottom: spacing.md,
     paddingHorizontal: spacing.md,
   },

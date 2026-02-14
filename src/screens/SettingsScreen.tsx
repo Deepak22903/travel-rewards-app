@@ -67,7 +67,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
     <View style={styles.container}>
       {/* Custom Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.header,
-    paddingTop: spacing.xl + 10,
+    paddingTop: spacing.xl + 20,
     paddingBottom: spacing.md,
     paddingHorizontal: spacing.md,
   },
