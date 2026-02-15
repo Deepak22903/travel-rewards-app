@@ -37,11 +37,17 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
 
   const loadSettings = async (): Promise<void> => {
     try {
-      const value = await AsyncStorage.getItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED);
+      const key = STORAGE_KEYS.NOTIFICATIONS_ENABLED;
+      if (!key) {
+        console.error('Storage key is undefined');
+        return;
+      }
+      const value = await AsyncStorage.getItem(key);
       if (value !== null) {
         setNotificationsEnabled(JSON.parse(value));
       }
     } catch (error) {
+      console.error('Error loading settings:', error);
       logStorageError(error, 'read', STORAGE_KEYS.NOTIFICATIONS_ENABLED);
     }
   };
@@ -49,11 +55,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
   const handleNotificationToggle = useCallback(async (value: boolean): Promise<void> => {
     setNotificationsEnabled(value);
     try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.NOTIFICATIONS_ENABLED,
-        JSON.stringify(value)
-      );
+      const key = STORAGE_KEYS.NOTIFICATIONS_ENABLED;
+      if (!key) {
+        console.error('Storage key is undefined');
+        return;
+      }
+      await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
+      console.error('Error saving settings:', error);
       logStorageError(error, 'write', STORAGE_KEYS.NOTIFICATIONS_ENABLED);
     }
   }, []);

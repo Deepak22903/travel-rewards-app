@@ -63,4 +63,5 @@ export const STORAGE_KEYS = {
   SETTINGS: '@travel_rewards:settings',
   LAST_REFRESH: '@travel_rewards:last_refresh',
   CLAIMED_REWARDS: '@travel_rewards:claimed_rewards',
+  NOTIFICATIONS_ENABLED: '@travel_rewards:notifications_enabled',
 } as const;
