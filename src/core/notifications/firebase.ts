@@ -64,7 +64,10 @@ export const getFCMToken = async (): Promise<string | null> => {
 /**
  * Setup FCM listeners
  */
-export const setupFCMListeners = (onNotificationReceived?: (notification: any) => void) => {
+export const setupFCMListeners = (
+  onNotificationReceived?: (notification: any) => void,
+  onNotificationOpened?: (notification: any) => void
+) => {
   // Handle foreground messages
   const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
     console.log('FCM foreground message:', remoteMessage);
@@ -79,9 +82,12 @@ export const setupFCMListeners = (onNotificationReceived?: (notification: any) =
     console.log('FCM background message:', remoteMessage);
   });
 
-  // Handle notification opened app
+  // Handle notification opened app from background
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log('Notification caused app to open from background:', remoteMessage);
+    if (onNotificationOpened && remoteMessage.data) {
+      onNotificationOpened(remoteMessage);
+    }
   });
 
   // Check if app was opened from a quit state notification
@@ -90,6 +96,9 @@ export const setupFCMListeners = (onNotificationReceived?: (notification: any) =
     .then(remoteMessage => {
       if (remoteMessage) {
         console.log('Notification caused app to open from quit state:', remoteMessage);
+        if (onNotificationOpened && remoteMessage.data) {
+          onNotificationOpened(remoteMessage);
+        }
       }
     });
 

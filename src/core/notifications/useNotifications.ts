@@ -37,16 +37,41 @@ export const useNotifications = (
 
     registerToken();
 
-    // Setup FCM listeners
-    const cleanup = setupFCMListeners((notification) => {
-      console.log('Foreground notification received:', notification);
+    // Helper to navigate based on notification data
+    const handleNotificationNavigation = (notification: any) => {
+      console.log('Handling notification navigation:', notification);
       
-      // Navigate based on notification data
-      const screen = notification.data?.screen;
-      if (screen && navigationRef.current) {
+      // Get target screen from notification data (default to Rewards)
+      const screen = notification.data?.screen || 'Rewards';
+      
+      // Wait for navigation to be ready
+      if (navigationRef.current?.isReady()) {
+        console.log(`Navigating to: ${screen}`);
         navigationRef.current.navigate(screen as keyof RootStackParamList);
+      } else {
+        // If not ready, wait a bit and retry
+        setTimeout(() => {
+          if (navigationRef.current?.isReady()) {
+            console.log(`Navigating to: ${screen} (delayed)`);
+            navigationRef.current.navigate(screen as keyof RootStackParamList);
+          }
+        }, 1000);
       }
-    });
+    };
+
+    // Setup FCM listeners
+    const cleanup = setupFCMListeners(
+      // Foreground notification received
+      (notification) => {
+        console.log('Foreground notification received:', notification);
+        // Optionally navigate immediately or show in-app notification
+      },
+      // Notification opened (background or quit state)
+      (notification) => {
+        console.log('Notification opened:', notification);
+        handleNotificationNavigation(notification);
+      }
+    );
 
     cleanupRef.current = cleanup;
 
