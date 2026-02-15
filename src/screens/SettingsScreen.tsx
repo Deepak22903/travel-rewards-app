@@ -32,7 +32,7 @@ interface SettingsScreenProps {
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -112,8 +112,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         
         console.log('✅ Notifications enabled successfully');
         Alert.alert(
-          'Success',
-          'You will now receive notifications about new rewards!',
+          'Notifications Enabled',
+          'You will now receive updates about new rewards!',
           [{ text: 'OK' }]
         );
         
