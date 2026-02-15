@@ -13,6 +13,7 @@ import {
   Switch,
   Linking,
   Image,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
@@ -21,6 +22,8 @@ import { STORAGE_KEYS } from '../core/types';
 import { logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
+import { requestFCMPermissions, getFCMToken, deleteFCMToken } from '../core/notifications/firebase';
+import { registerPushToken, unregisterPushToken } from '../core/api/notifications';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -29,7 +32,8 @@ interface SettingsScreenProps {
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -53,19 +57,91 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
   };
 
   const handleNotificationToggle = useCallback(async (value: boolean): Promise<void> => {
-    setNotificationsEnabled(value);
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
     try {
-      const key = STORAGE_KEYS.NOTIFICATIONS_ENABLED;
-      if (!key) {
-        console.error('Storage key is undefined');
-        return;
+      if (value) {
+        // Enable notifications
+        console.log('Requesting FCM permissions...');
+        const hasPermission = await requestFCMPermissions();
+        
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Required',
+            'Please enable notifications in your device settings to receive updates about new rewards.',
+            [{ text: 'OK' }]
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        console.log('Getting FCM token...');
+        const token = await getFCMToken();
+        
+        if (!token) {
+          Alert.alert(
+            'Error',
+            'Unable to get notification token. Please try again.',
+            [{ text: 'OK' }]
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        console.log('Registering token with backend...');
+        const registered = await registerPushToken();
+        
+        if (!registered) {
+          Alert.alert(
+            'Registration Failed',
+            'Could not register for notifications. Please check your connection and try again.',
+            [{ text: 'OK' }]
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        // Success - save to storage
+        setNotificationsEnabled(true);
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.NOTIFICATIONS_ENABLED,
+          JSON.stringify(true)
+        );
+        
+        console.log('✅ Notifications enabled successfully');
+        Alert.alert(
+          'Success',
+          'You will now receive notifications about new rewards!',
+          [{ text: 'OK' }]
+        );
+        
+      } else {
+        // Disable notifications
+        console.log('Unregistering token...');
+        await unregisterPushToken();
+        await deleteFCMToken();
+        
+        setNotificationsEnabled(false);
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.NOTIFICATIONS_ENABLED,
+          JSON.stringify(false)
+        );
+        
+        console.log('✅ Notifications disabled');
       }
-      await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error('Error saving settings:', error);
-      logStorageError(error, 'write', STORAGE_KEYS.NOTIFICATIONS_ENABLED);
+      console.error('Error toggling notifications:', error);
+      Alert.alert(
+        'Error',
+        'Something went wrong. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [isLoading]);
 
   const handleOpenLink = useCallback((url: string): void => {
     Linking.openURL(url).catch(err => {
@@ -97,6 +173,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             <Switch
               value={notificationsEnabled}
               onValueChange={handleNotificationToggle}
+              disabled={isLoading}
               trackColor={{ false: colors.cardBorder, true: colors.success }}
               thumbColor={colors.white}
               ios_backgroundColor={colors.cardBorder}
