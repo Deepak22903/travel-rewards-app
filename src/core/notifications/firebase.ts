@@ -36,16 +36,10 @@ export const requestFCMPermissions = async (): Promise<boolean> => {
  */
 export const getFCMToken = async (): Promise<string | null> => {
   try {
-    // Check if we have permission
-    if (Platform.OS === 'ios') {
-      const hasPermission = await requestFCMPermissions();
-      if (!hasPermission) {
-        console.log('FCM permission denied');
-        return null;
-      }
-    }
+    // Always attempt to get FCM token. For Android (>=13) and iOS the system permission
+    // controls whether notifications show, but the token can still be obtained and used
+    // by backend for other targeting where appropriate.
 
-    // Get FCM token
     const token = await messaging().getToken();
     
     if (token) {

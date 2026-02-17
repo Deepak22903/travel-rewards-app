@@ -17,7 +17,7 @@ interface TokenRegistrationResponse {
 /**
  * Register FCM push notification token with backend
  */
-export const registerPushToken = async (): Promise<boolean> => {
+export const registerPushToken = async (notifications_enabled: boolean = true): Promise<boolean> => {
   try {
     const token = await getFCMToken();
     
@@ -33,6 +33,7 @@ export const registerPushToken = async (): Promise<boolean> => {
         device_type: Platform.OS,
         app_version: APP_CONFIG.APP_VERSION,
         token_type: 'fcm', // Specify this is an FCM token
+        notifications_enabled: notifications_enabled,
       }
     );
 
