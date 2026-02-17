@@ -78,6 +78,32 @@ export const unregisterPushToken = async (): Promise<boolean> => {
 };
 
 /**
+ * Update push token state (enable/disable) on backend without deleting token locally
+ */
+export const updatePushTokenState = async (enabled: boolean): Promise<boolean> => {
+  try {
+    const token = await getFCMToken();
+    if (!token) return false;
+
+    const response = await client.put<TokenRegistrationResponse>(
+      `/notifications/${token}/enable`,
+      { notifications_enabled: enabled }
+    );
+
+    if (response.data.success) {
+      console.log(`✅ Updated token state to ${enabled}`);
+      return true;
+    }
+
+    console.error('Failed updating token state:', response.data.message);
+    return false;
+  } catch (error) {
+    console.error('Error updating token state:', error);
+    return false;
+  }
+};
+
+/**
  * Test notification sending (for development)
  */
 export const sendTestNotification = async (): Promise<boolean> => {

@@ -22,8 +22,8 @@ import { STORAGE_KEYS } from '../core/types';
 import { logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
-import { requestFCMPermissions, getFCMToken, deleteFCMToken } from '../core/notifications/firebase';
-import { registerPushToken, unregisterPushToken } from '../core/api/notifications';
+import { requestFCMPermissions, getFCMToken } from '../core/notifications/firebase';
+import { registerPushToken, updatePushTokenState } from '../core/api/notifications';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -118,18 +118,26 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         );
         
       } else {
-        // Disable notifications
-        console.log('Unregistering token...');
-        await unregisterPushToken();
-        await deleteFCMToken();
-        
+        // Disable notifications: update server state but keep token locally
+        console.log('Updating token state to disabled on backend...');
+        const updated = await updatePushTokenState(false);
+        if (!updated) {
+          Alert.alert(
+            'Error',
+            'Could not update notification settings on server. Please try again.',
+            [{ text: 'OK' }]
+          );
+          setIsLoading(false);
+          return;
+        }
+
         setNotificationsEnabled(false);
         await AsyncStorage.setItem(
           STORAGE_KEYS.NOTIFICATIONS_ENABLED,
           JSON.stringify(false)
         );
-        
-        console.log('✅ Notifications disabled');
+
+        console.log('✅ Notifications disabled (server updated)');
       }
     } catch (error) {
       console.error('Error toggling notifications:', error);
