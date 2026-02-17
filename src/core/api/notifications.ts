@@ -17,7 +17,7 @@ interface TokenRegistrationResponse {
 /**
  * Register FCM push notification token with backend
  */
-export const registerPushToken = async (): Promise<boolean> => {
+export const registerPushToken = async (notifications_enabled: boolean = true): Promise<boolean> => {
   try {
     const token = await getFCMToken();
     
@@ -33,6 +33,7 @@ export const registerPushToken = async (): Promise<boolean> => {
         device_type: Platform.OS,
         app_version: APP_CONFIG.APP_VERSION,
         token_type: 'fcm', // Specify this is an FCM token
+        notifications_enabled: notifications_enabled,
       }
     );
 
@@ -72,6 +73,32 @@ export const unregisterPushToken = async (): Promise<boolean> => {
     return false;
   } catch (error) {
     console.error('Error unregistering FCM token:', error);
+    return false;
+  }
+};
+
+/**
+ * Update push token state (enable/disable) on backend without deleting token locally
+ */
+export const updatePushTokenState = async (enabled: boolean): Promise<boolean> => {
+  try {
+    const token = await getFCMToken();
+    if (!token) return false;
+
+    const response = await client.put<TokenRegistrationResponse>(
+      `/notifications/${token}/enable`,
+      { notifications_enabled: enabled }
+    );
+
+    if (response.data.success) {
+      console.log(`✅ Updated token state to ${enabled}`);
+      return true;
+    }
+
+    console.error('Failed updating token state:', response.data.message);
+    return false;
+  } catch (error) {
+    console.error('Error updating token state:', error);
     return false;
   }
 };
