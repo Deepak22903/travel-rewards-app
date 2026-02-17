@@ -104,8 +104,8 @@ android {
             enable true
             reset()
             // Only include modern architectures (drops x86/x86_64)
-            include "armeabi-v7a", "arm64-v8a"
-            universalApk false
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            universalApk true
         }
     }
     signingConfigs {
