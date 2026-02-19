@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Expo Dev Server",
+			"type": "shell",
+			"command": "cd /home/deepak/myProjects/travel-rewards-app && npx expo start",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Build & Run Android Dev Build",
+			"type": "shell",
+			"command": "cd /home/deepak/myProjects/travel-rewards-app && export ANDROID_HOME=~/Android/Sdk && export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools && npx expo run:android",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

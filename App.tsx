@@ -56,12 +56,12 @@ export default function App(): React.JSX.Element {
     setShowPermModal(false);
     // OS dialog now appears cleanly with no competing backdrop
     const granted = await requestFCMPermissions();
-    console.log('Notification permission granted:', granted);
+    if (__DEV__) console.log('Notification permission granted:', granted);
     // Register token regardless — notifications_enabled flag tells backend the state
     const token = await getFCMToken();
     if (token) {
       const registered = await registerPushToken(granted);
-      if (registered) console.log('✅ FCM token registered with backend');
+      if (registered && __DEV__) console.log('✅ FCM token registered with backend');
     }
     await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, granted ? 'true' : 'false');
   };

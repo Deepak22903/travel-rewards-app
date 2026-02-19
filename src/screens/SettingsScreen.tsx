@@ -126,7 +126,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
       if (granted) {
         setNotificationsEnabled(true);
         await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'true');
-        console.log('✅ Notifications enabled from Settings');
+        if (__DEV__) console.log('✅ Notifications enabled from Settings');
       } else {
         Alert.alert(
           'Permission Denied',
@@ -194,7 +194,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         >
           <View style={styles.appRow}>
             <Text style={styles.iconMedium}>📘</Text>
-            <Text style={styles.appLabel}>Facebook Travel Rewards</Text>
+            <Text style={styles.appLabel}>Facebook TT Energy</Text>
           </View>
         </TouchableOpacity>
 
@@ -247,13 +247,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
               <Text style={styles.iconSmall}>‹›</Text>
               <Text style={styles.versionLabel}>Version</Text>
             </View>
-            <Text style={styles.versionNumber}>{APP_CONFIG.VERSION}</Text>
+            <Text style={styles.versionNumber}>{APP_CONFIG.APP_VERSION}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <Text style={styles.disclaimerText}>
-            Travel Rewards is an independent application and is in no way affiliated with, endorsed, or approved by Magmatic Games LTD or Travel Town
+            TT Energy - Reward Links is an independent application and is in no way affiliated with, endorsed, or approved by Magmatic Games LTD or Travel Town
           </Text>
         </View>
 

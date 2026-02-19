@@ -70,7 +70,7 @@ export const requestFCMPermissions = async (): Promise<boolean> => {
         PERM_STATUS_KEY,
         granted ? 'granted' : neverAskAgain ? 'blocked' : 'denied'
       );
-      console.log('Android POST_NOTIFICATIONS permission:', result);
+      if (__DEV__) console.log('Android POST_NOTIFICATIONS permission:', result);
       return granted;
     }
 
@@ -80,7 +80,7 @@ export const requestFCMPermissions = async (): Promise<boolean> => {
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
     await AsyncStorage.setItem(PERM_STATUS_KEY, enabled ? 'granted' : 'blocked');
-    if (enabled) console.log('FCM Authorization status:', authStatus);
+    if (enabled && __DEV__) console.log('FCM Authorization status:', authStatus);
     return enabled;
   } catch (error) {
     console.error('Error requesting FCM permissions:', error);
@@ -100,7 +100,7 @@ export const getFCMToken = async (): Promise<string | null> => {
     const token = await messaging().getToken();
     
     if (token) {
-      console.log('FCM Token:', token);
+      if (__DEV__) console.log('FCM Token:', token);
       await AsyncStorage.setItem(FCM_TOKEN_KEY, token);
       return token;
     }
@@ -121,8 +121,8 @@ export const setupFCMListeners = (
 ) => {
   // Handle foreground messages
   const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-    console.log('FCM foreground message:', remoteMessage);
-    
+    if (__DEV__) console.log('FCM foreground message:', remoteMessage);
+
     if (onNotificationReceived) {
       onNotificationReceived(remoteMessage);
     }
@@ -130,12 +130,12 @@ export const setupFCMListeners = (
 
   // Handle background/quit state messages
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('FCM background message:', remoteMessage);
+    if (__DEV__) console.log('FCM background message:', remoteMessage);
   });
 
   // Handle notification opened app from background
   messaging().onNotificationOpenedApp(remoteMessage => {
-    console.log('Notification caused app to open from background:', remoteMessage);
+    if (__DEV__) console.log('Notification caused app to open from background:', remoteMessage);
     if (onNotificationOpened && remoteMessage.data) {
       onNotificationOpened(remoteMessage);
     }
@@ -146,7 +146,7 @@ export const setupFCMListeners = (
     .getInitialNotification()
     .then(remoteMessage => {
       if (remoteMessage) {
-        console.log('Notification caused app to open from quit state:', remoteMessage);
+        if (__DEV__) console.log('Notification caused app to open from quit state:', remoteMessage);
         if (onNotificationOpened && remoteMessage.data) {
           onNotificationOpened(remoteMessage);
         }
@@ -155,7 +155,7 @@ export const setupFCMListeners = (
 
   // Handle token refresh
   const unsubscribeOnTokenRefresh = messaging().onTokenRefresh(token => {
-    console.log('FCM token refreshed:', token);
+    if (__DEV__) console.log('FCM token refreshed:', token);
     AsyncStorage.setItem(FCM_TOKEN_KEY, token);
     // TODO: Send updated token to backend
   });
@@ -174,7 +174,7 @@ export const deleteFCMToken = async (): Promise<boolean> => {
   try {
     await messaging().deleteToken();
     await AsyncStorage.removeItem(FCM_TOKEN_KEY);
-    console.log('FCM token deleted');
+    if (__DEV__) console.log('FCM token deleted');
     return true;
   } catch (error) {
     console.error('Error deleting FCM token:', error);
