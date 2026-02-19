@@ -22,8 +22,13 @@ import { STORAGE_KEYS } from '../core/types';
 import { logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
-import { requestFCMPermissions, getFCMToken } from '../core/notifications/firebase';
+import {
+  requestFCMPermissions,
+  getFCMToken,
+  checkNotificationPermissionStatus,
+} from '../core/notifications/firebase';
 import { registerPushToken, updatePushTokenState } from '../core/api/notifications';
+import { NotificationPermissionModal } from '../components';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -34,6 +39,7 @@ interface SettingsScreenProps {
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPermModal, setShowPermModal] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -58,98 +64,89 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
 
   const handleNotificationToggle = useCallback(async (value: boolean): Promise<void> => {
     if (isLoading) return;
-    
     setIsLoading(true);
-    
+
     try {
       if (value) {
-        // Enable notifications
-        console.log('Requesting FCM permissions...');
-        const hasPermission = await requestFCMPermissions();
-        
-        if (!hasPermission) {
+        // --- ENABLING ---
+        const status = await checkNotificationPermissionStatus();
+
+        if (status === 'blocked') {
+          // OS will never show a prompt — direct user to device Settings
           Alert.alert(
-            'Permission Required',
-            'Please enable notifications in your device settings to receive updates about new rewards.',
-            [{ text: 'OK' }]
+            'Notifications Blocked',
+            'Please enable notifications for this app in your device Settings.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => Linking.openSettings() },
+            ]
           );
           setIsLoading(false);
           return;
         }
 
-        console.log('Getting FCM token...');
-        const token = await getFCMToken();
-        
-        if (!token) {
-          Alert.alert(
-            'Error',
-            'Unable to get notification token. Please try again.',
-            [{ text: 'OK' }]
-          );
+        if (status === 'granted') {
+          // OS already allows — just flip the backend flag
+          await updatePushTokenState(true);
+          setNotificationsEnabled(true);
+          await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'true');
           setIsLoading(false);
           return;
         }
 
-        console.log('Registering token with backend...');
-        const registered = await registerPushToken();
-        
-        if (!registered) {
-          Alert.alert(
-            'Registration Failed',
-            'Could not register for notifications. Please check your connection and try again.',
-            [{ text: 'OK' }]
-          );
-          setIsLoading(false);
-          return;
-        }
+        // not_asked or denied — show in-app rationale modal before OS prompt
+        setIsLoading(false);
+        setShowPermModal(true);
+        return;
 
-        // Success - save to storage
-        setNotificationsEnabled(true);
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.NOTIFICATIONS_ENABLED,
-          JSON.stringify(true)
-        );
-        
-        console.log('✅ Notifications enabled successfully');
-        Alert.alert(
-          'Notifications Enabled',
-          'You will now receive updates about new rewards!',
-          [{ text: 'OK' }]
-        );
-        
       } else {
-        // Disable notifications: update server state but keep token locally
-        console.log('Updating token state to disabled on backend...');
-        const updated = await updatePushTokenState(false);
-        if (!updated) {
-          Alert.alert(
-            'Error',
-            'Could not update notification settings on server. Please try again.',
-            [{ text: 'OK' }]
-          );
-          setIsLoading(false);
-          return;
-        }
-
+        // --- DISABLING ---
+        // Best-effort update on backend; always reflect locally
+        await updatePushTokenState(false);
         setNotificationsEnabled(false);
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.NOTIFICATIONS_ENABLED,
-          JSON.stringify(false)
-        );
-
-        console.log('✅ Notifications disabled (server updated)');
+        await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'false');
+        console.log('✅ Notifications disabled');
       }
     } catch (error) {
       console.error('Error toggling notifications:', error);
-      Alert.alert(
-        'Error',
-        'Something went wrong. Please try again.',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Error', 'Something went wrong. Please try again.', [{ text: 'OK' }]);
     } finally {
       setIsLoading(false);
     }
   }, [isLoading]);
+
+  // User tapped "Allow" in the rationale modal (triggered from Settings toggle)
+  const handleModalAllow = useCallback(async (): Promise<void> => {
+    setShowPermModal(false);
+    setIsLoading(true);
+    try {
+      const granted = await requestFCMPermissions();
+      const token = await getFCMToken();
+      if (token) await registerPushToken(granted);
+      if (granted) {
+        setNotificationsEnabled(true);
+        await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'true');
+        console.log('✅ Notifications enabled from Settings');
+      } else {
+        Alert.alert(
+          'Permission Denied',
+          'To enable notifications, please allow them in your device Settings.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error enabling notifications from modal:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleModalNotNow = useCallback((): void => {
+    setShowPermModal(false);
+  }, []);
 
   const handleOpenLink = useCallback((url: string): void => {
     Linking.openURL(url).catch(err => {
@@ -271,6 +268,11 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <NotificationPermissionModal
+        visible={showPermModal}
+        onAllow={handleModalAllow}
+        onNotNow={handleModalNotNow}
+      />
     </View>
   );
 };

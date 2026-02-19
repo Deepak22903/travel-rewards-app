@@ -12,10 +12,18 @@ import { ApiResponse, RewardsApiResponse, RewardSection } from '../types';
 export const getRewards = async (): Promise<ApiResponse<RewardSection[]>> => {
   try {
     const response = await client.get<RewardsApiResponse>('/rewards');
+    // Normalize: backend may return 'url' (new) or 'code' (legacy) — prefer 'url'
+    const data = response.data.data.map(section => ({
+      ...section,
+      data: section.data.map(reward => ({
+        ...reward,
+        url: (reward as any).url ?? (reward as any).code,
+      })),
+    }));
     return {
       success: true,
       message: response.data.message,
-      data: response.data.data,
+      data,
     };
   } catch (error) {
     console.error('Failed to fetch rewards:', error);

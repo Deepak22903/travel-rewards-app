@@ -10,16 +10,20 @@ import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-gesture-handler';
 import { AppNavigator } from './src/navigation/AppNavigator';
-import { ErrorBoundary } from './src/components';
+import { ErrorBoundary, NotificationPermissionModal } from './src/components';
 import { customFonts } from './src/core/constants/fonts';
-import { requestFCMPermissions, getFCMToken } from './src/core/notifications/firebase';
+import {
+  requestFCMPermissions,
+  getFCMToken,
+  checkNotificationPermissionStatus,
+  PERM_STATUS_KEY,
+} from './src/core/notifications/firebase';
 import { registerPushToken } from './src/core/api/notifications';
-import * as Notifications from 'expo-notifications';
-import { Platform, Alert, Linking } from 'react-native';
 import { STORAGE_KEYS } from './src/core/types';
 
 export default function App(): React.JSX.Element {
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [showPermModal, setShowPermModal] = useState(false);
 
   useEffect(() => {
     async function loadFonts() {
@@ -30,81 +34,48 @@ export default function App(): React.JSX.Element {
   }, []);
 
   useEffect(() => {
-    async function setupNotifications() {
+    // Check permission status on every launch.
+    // Show the in-app rationale modal if not yet granted and still ask-able.
+    async function checkPermissionOnLaunch() {
       try {
-        // Check if this is the first launch
-        const hasLaunchedBefore = await AsyncStorage.getItem('@has_launched_before');
-        
-        if (!hasLaunchedBefore) {
-          console.log('First launch detected - requesting notification permissions...');
-
-          // Show a brief rationale before prompting (could be replaced with a nicer modal)
-          let shouldPrompt = true;
-          try {
-            // Use Expo Notifications to check current permission status (works across platforms)
-            const permissionInfo = await Notifications.getPermissionsAsync();
-            if (permissionInfo.status === 'granted') {
-              shouldPrompt = false;
-            }
-          } catch (e) {
-            // ignore and prompt
-          }
-
-          let hasPermission = false;
-          if (shouldPrompt) {
-            // Optional: show a simple Alert as a rationale
-            const proceed = await new Promise<boolean>(resolve => {
-              Alert.alert(
-                'Enable notifications?',
-                'We send booking updates and special offers. Would you like to enable notifications?',
-                [
-                  { text: 'Not now', onPress: () => resolve(false), style: 'cancel' },
-                  { text: 'Allow', onPress: () => resolve(true) },
-                ],
-                { cancelable: true }
-              );
-            });
-
-            if (proceed) {
-              hasPermission = await requestFCMPermissions();
-            } else {
-              hasPermission = false;
-            }
-          } else {
-            // Already granted
-            hasPermission = true;
-          }
-
-          // Regardless of permission result, obtain FCM token and register with backend.
-          // Backend will be informed whether notifications are enabled via notifications_enabled flag.
-          const token = await getFCMToken();
-          if (token) {
-            console.log('Token obtained - registering with backend (notifications_enabled=', hasPermission, ')');
-            const registered = await registerPushToken(hasPermission);
-            if (registered) {
-              console.log('✅ FCM token registered with backend');
-            }
-          } else {
-            console.log('No token obtained');
-          }
-
-          // Persist the user's choice locally
-          await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, hasPermission ? 'true' : 'false');
-
-          // Mark that we've launched before
-          await AsyncStorage.setItem('@has_launched_before', 'true');
-        } else {
-          console.log('Not first launch - skipping automatic notification setup');
+        const status = await checkNotificationPermissionStatus();
+        if (status === 'not_asked' || status === 'denied') {
+          setShowPermModal(true);
         }
+        // 'granted': already set up — nothing to do.
+        // 'blocked': OS won't show prompt anyway — user must open Settings manually.
       } catch (error) {
-        console.error('Error setting up notifications on first launch:', error);
+        console.error('Error checking notification permission on launch:', error);
       }
     }
-
-    if (fontsLoaded) {
-      setupNotifications();
-    }
+    if (fontsLoaded) checkPermissionOnLaunch();
   }, [fontsLoaded]);
+
+  // User tapped "Allow" in the in-app rationale modal
+  const handlePermAllow = async () => {
+    setShowPermModal(false);
+    // OS dialog now appears cleanly with no competing backdrop
+    const granted = await requestFCMPermissions();
+    console.log('Notification permission granted:', granted);
+    // Register token regardless — notifications_enabled flag tells backend the state
+    const token = await getFCMToken();
+    if (token) {
+      const registered = await registerPushToken(granted);
+      if (registered) console.log('✅ FCM token registered with backend');
+    }
+    await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, granted ? 'true' : 'false');
+  };
+
+  // User tapped "Not now" in the in-app rationale modal
+  const handlePermNotNow = async () => {
+    setShowPermModal(false);
+    // Mark as denied so modal shows again next launch (per spec: until granted or blocked)
+    await AsyncStorage.setItem(PERM_STATUS_KEY, 'denied');
+    await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'false');
+    // Still register token with disabled flag so backend has the device record
+    const token = await getFCMToken();
+    if (token) await registerPushToken(false);
+  };
 
   if (!fontsLoaded) {
     return (
@@ -118,6 +89,11 @@ export default function App(): React.JSX.Element {
     <ErrorBoundary>
       <AppNavigator />
       <StatusBar style="light" />
+      <NotificationPermissionModal
+        visible={showPermModal}
+        onAllow={handlePermAllow}
+        onNotNow={handlePermNotNow}
+      />
     </ErrorBoundary>
   );
 }

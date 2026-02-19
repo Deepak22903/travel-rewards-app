@@ -14,7 +14,7 @@ interface Environment {
 }
 
 const dev: Environment = {
-  API_BASE_URL: 'https://smartlink-api-601738079869.us-central1.run.app/api',
+  API_BASE_URL: 'https://consulting-corpus-pumps-council.trycloudflare.com/api',
   APP_STORE_URL: 'https://apps.apple.com/app/id123456789',
   PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=com.travelrewards',
   ADMOB_APP_ID: 'ca-app-pub-3940256099942544~3347511713', // Test ID

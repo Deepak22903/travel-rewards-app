@@ -29,11 +29,11 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
     if (!reward) return;
 
     try {
-      const supported = await Linking.canOpenURL(reward.code);
+      const supported = await Linking.canOpenURL(reward.url);
       if (supported) {
         // Mark as claimed before opening the link
         onClaim(reward);
-        await Linking.openURL(reward.code);
+        await Linking.openURL(reward.url);
         onClose();
       } else {
         Alert.alert('Error', 'Cannot open this link');
