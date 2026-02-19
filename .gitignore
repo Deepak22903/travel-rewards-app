@@ -40,3 +40,4 @@ yarn-error.*
 /ios
 # Keep android folder for custom optimizations
 # /android
+android/gradle.properties
