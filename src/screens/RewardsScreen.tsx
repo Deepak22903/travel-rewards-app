@@ -80,7 +80,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
           ...section,
           data: section.data.map(reward => ({
             ...reward,
-            claimed: claimedRewards.has(reward.id),
+            claimed: claimedRewards.has(reward.url),  // Use URL as stable key
           })),
         }));
         setSections(updatedSections);
@@ -128,7 +128,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const handleClaimReward = useCallback((reward: Reward): void => {
     if (!reward.claimed) {
       const newClaimed = new Set(claimedRewards);
-      newClaimed.add(reward.id);
+      newClaimed.add(reward.url);  // Use URL as stable key
       setClaimedRewards(newClaimed);
       saveClaimedRewards(newClaimed);
 
