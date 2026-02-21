@@ -187,57 +187,57 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         </View>
 
         {/* Other Apps Section */}
-        <Text style={styles.sectionHeader}>Other apps</Text>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleOpenLink('https://facebook.com')}
-        >
-          <View style={styles.appRow}>
-            <Text style={styles.iconMedium}>📘</Text>
-            <Text style={styles.appLabel}>Facebook TT Energy</Text>
-          </View>
-        </TouchableOpacity>
-
+        {/* <Text style={styles.sectionHeader}>Other apps</Text> */}
+        {/* <TouchableOpacity */}
+        {/*   style={styles.card} */}
+        {/*   onPress={() => handleOpenLink('https://facebook.com')} */}
+        {/* > */}
+        {/*   <View style={styles.appRow}> */}
+        {/*     <Text style={styles.iconMedium}>📘</Text> */}
+        {/*     <Text style={styles.appLabel}>Facebook TT Energy</Text> */}
+        {/*   </View> */}
+        {/* </TouchableOpacity> */}
+        {/**/}
         {/* Game Apps */}
-        <Text style={styles.sectionHeader}>Game Rewards</Text>
-        <View style={styles.card}>
-          <TouchableOpacity style={styles.gameRow}>
-            <View style={styles.gameIconContainer}>
-              <Text style={styles.iconMedium}>🎲</Text>
-            </View>
-            <View style={styles.gameInfo}>
-              <Text style={styles.gameTitle}>Go'Rewards</Text>
-              <Text style={styles.gameSubtitle}>MONOPOLY GO!</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.gameRow}>
-            <View style={styles.gameIconContainer}>
-              <Text style={styles.iconMedium}>🎲</Text>
-            </View>
-            <View style={styles.gameInfo}>
-              <Text style={styles.gameTitle}>Dreams Rewards</Text>
-              <Text style={styles.gameSubtitle}>Dice Dreams™</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.gameRow}>
-            <View style={styles.gameIconContainer}>
-              <Text style={styles.iconMedium}>⚡</Text>
-            </View>
-            <View style={styles.gameInfo}>
-              <Text style={styles.gameTitle}>Islander Rewards</Text>
-              <Text style={styles.gameSubtitle}>Family Island</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-        </View>
+        {/* <Text style={styles.sectionHeader}>Game Rewards</Text> */}
+        {/* <View style={styles.card}> */}
+        {/*   <TouchableOpacity style={styles.gameRow}> */}
+        {/*     <View style={styles.gameIconContainer}> */}
+        {/*       <Text style={styles.iconMedium}>🎲</Text> */}
+        {/*     </View> */}
+        {/*     <View style={styles.gameInfo}> */}
+        {/*       <Text style={styles.gameTitle}>Go'Rewards</Text> */}
+        {/*       <Text style={styles.gameSubtitle}>MONOPOLY GO!</Text> */}
+        {/*     </View> */}
+        {/*     <Text style={styles.chevron}>›</Text> */}
+        {/*   </TouchableOpacity> */}
+        {/**/}
+        {/*   <View style={styles.divider} /> */}
+        {/**/}
+        {/*   <TouchableOpacity style={styles.gameRow}> */}
+        {/*     <View style={styles.gameIconContainer}> */}
+        {/*       <Text style={styles.iconMedium}>🎲</Text> */}
+        {/*     </View> */}
+        {/*     <View style={styles.gameInfo}> */}
+        {/*       <Text style={styles.gameTitle}>Dreams Rewards</Text> */}
+        {/*       <Text style={styles.gameSubtitle}>Dice Dreams™</Text> */}
+        {/*     </View> */}
+        {/*     <Text style={styles.chevron}>›</Text> */}
+        {/*   </TouchableOpacity> */}
+        {/**/}
+        {/*   <View style={styles.divider} /> */}
+        {/**/}
+        {/*   <TouchableOpacity style={styles.gameRow}> */}
+        {/*     <View style={styles.gameIconContainer}> */}
+        {/*       <Text style={styles.iconMedium}>⚡</Text> */}
+        {/*     </View> */}
+        {/*     <View style={styles.gameInfo}> */}
+        {/*       <Text style={styles.gameTitle}>Islander Rewards</Text> */}
+        {/*       <Text style={styles.gameSubtitle}>Family Island</Text> */}
+        {/*     </View> */}
+        {/*     <Text style={styles.chevron}>›</Text> */}
+        {/*   </TouchableOpacity> */}
+        {/* </View> */}
 
         {/* Information Section */}
         <Text style={styles.sectionHeader}>Information</Text>
