@@ -47,13 +47,21 @@ export const useNotifications = (
       // Wait for navigation to be ready
       if (navigationRef.current?.isReady()) {
         console.log(`Navigating to: ${screen}`);
-        navigationRef.current.navigate(screen as keyof RootStackParamList);
+        if (screen === 'Rewards') {
+          navigationRef.current.navigate('Rewards', { fromNotification: Date.now() });
+        } else {
+          navigationRef.current.navigate(screen as keyof RootStackParamList);
+        }
       } else {
         // If not ready, wait a bit and retry
         setTimeout(() => {
           if (navigationRef.current?.isReady()) {
             console.log(`Navigating to: ${screen} (delayed)`);
-            navigationRef.current.navigate(screen as keyof RootStackParamList);
+            if (screen === 'Rewards') {
+              navigationRef.current.navigate('Rewards', { fromNotification: Date.now() });
+            } else {
+              navigationRef.current.navigate(screen as keyof RootStackParamList);
+            }
           }
         }, 1000);
       }

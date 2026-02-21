@@ -24,6 +24,7 @@ import { useInterstitialAd } from '../core/ads/useInterstitialAd';
 import { shouldShowInterstitial } from '../core/ads/adConfig';
 import { logError, logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../core/types';
 
 type RewardsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Rewards'>;
@@ -33,6 +34,7 @@ interface RewardsScreenProps {
 }
 
 export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
+  const route = useRoute<RouteProp<RootStackParamList, 'Rewards'>>();
   const [sections, setSections] = useState<RewardSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -107,6 +109,15 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       fetchRewards();
     }
   }, [initialized, fetchRewards]);
+
+  // Auto-refresh when navigated to via a push notification tap
+  useEffect(() => {
+    const fromNotification = route.params?.fromNotification;
+    if (fromNotification && initialized) {
+      setRefreshing(true);
+      loadClaimedRewards().then(() => fetchRewards());
+    }
+  }, [route.params?.fromNotification]);
 
   const handleRefresh = useCallback((): void => {
     setRefreshing(true);

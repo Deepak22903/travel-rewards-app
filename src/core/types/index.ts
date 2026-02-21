@@ -40,7 +40,7 @@ export interface RewardsApiResponse {
 // Navigation Types
 export type RootStackParamList = {
   Home: undefined;
-  Rewards: undefined;
+  Rewards: { fromNotification?: number } | undefined;
   Settings: undefined;
 };
 
