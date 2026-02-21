@@ -41,8 +41,25 @@ export default function App(): React.JSX.Element {
         const status = await checkNotificationPermissionStatus();
         if (status === 'not_asked' || status === 'denied') {
           setShowPermModal(true);
+        } else if (status === 'granted') {
+          // 'granted' has two cases:
+          //   (a) Android < 13: OS auto-grants — but requestFCMPermissions() was never
+          //       called, so messaging().requestPermission() was never invoked. Without
+          //       it, messaging().getToken() can fail silently on some devices.
+          //   (b) Android 13+: user already allowed in a previous session.
+          // Distinguish by PERM_STATUS_KEY: it is only written by requestFCMPermissions().
+          // If it is absent, we are in case (a) — do a silent one-time FCM init.
+          const alreadySetUp = await AsyncStorage.getItem(PERM_STATUS_KEY);
+          if (!alreadySetUp) {
+            // No UI shown on Android < 13; messaging().requestPermission() returns
+            // AUTHORIZED immediately and initialises the FCM connection.
+            const granted = await requestFCMPermissions();
+            const token = await getFCMToken();
+            if (token) await registerPushToken(granted);
+            await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'true');
+            if (__DEV__) console.log('Silent FCM init done for Android < 13, token registered');
+          }
         }
-        // 'granted': already set up — nothing to do.
         // 'blocked': OS won't show prompt anyway — user must open Settings manually.
       } catch (error) {
         console.error('Error checking notification permission on launch:', error);

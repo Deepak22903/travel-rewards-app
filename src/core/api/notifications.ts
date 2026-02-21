@@ -34,6 +34,7 @@ export const registerPushToken = async (notifications_enabled: boolean = true): 
         app_version: APP_CONFIG.APP_VERSION,
         token_type: 'fcm', // Specify this is an FCM token
         notifications_enabled: notifications_enabled,
+        app_id: 'travel_town', // Identifies this as a Travel Town app token for targeted push notifications
       }
     );
 
