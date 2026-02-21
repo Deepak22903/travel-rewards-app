@@ -16,7 +16,19 @@ expo-env.d.ts
 *.p8
 *.p12
 *.key
+*.keystore
 *.mobileprovision
+
+# Firebase config (contains API keys)
+google-services.json
+GoogleService-Info.plist
+
+# Android local machine config
+android/local.properties
+
+# Sensitive info files
+admobAdCodes.txt
+policyLinks.txt
 
 # Metro
 .metro-health-check*
@@ -31,6 +43,8 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
+.env.local
 .env*.local
 
 # typescript

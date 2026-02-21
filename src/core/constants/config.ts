@@ -16,21 +16,21 @@ interface Environment {
 }
 
 const dev: Environment = {
-  API_BASE_URL: 'https://consulting-corpus-pumps-council.trycloudflare.com/api',
+  API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
   APP_STORE_URL: 'https://apps.apple.com/app/id123456789', // TODO: Replace with real App Store URL after listing is created
   PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=com.travelrewards.app',
-  ADMOB_APP_ID: 'ca-app-pub-3940256099942544~3347511713', // Test ID
-  PRIVACY_POLICY_URL: 'https://example.com/privacy-policy', // TODO: Replace with your hosted privacy policy URL
-  TERMS_URL: 'https://example.com/terms', // TODO: Replace with your hosted terms of service URL
+  ADMOB_APP_ID: process.env.EXPO_PUBLIC_ADMOB_APP_ID_DEV ?? 'ca-app-pub-3940256099942544~3347511713',
+  PRIVACY_POLICY_URL: 'https://ttenergyapp.blogspot.com/p/privacy-policy-tt-energy-app.html',
+  TERMS_URL: 'https://ttenergyapp.blogspot.com/p/terms-conditions-tt-energy.html',
 };
 
 const prod: Environment = {
-  API_BASE_URL: 'https://smartlink-api-601738079869.us-central1.run.app/api',
+  API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
   APP_STORE_URL: 'https://apps.apple.com/app/id123456789', // TODO: Replace with real App Store URL after listing is created
   PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=com.travelrewards.app',
-  ADMOB_APP_ID: 'YOUR_PRODUCTION_ADMOB_ID', // TODO: Replace with AdMob App ID from AdMob console
-  PRIVACY_POLICY_URL: 'https://example.com/privacy-policy', // TODO: Required for store submission — replace with hosted URL
-  TERMS_URL: 'https://example.com/terms', // TODO: Required for store submission — replace with hosted URL
+  ADMOB_APP_ID: process.env.EXPO_PUBLIC_ADMOB_APP_ID_PROD ?? '',
+  PRIVACY_POLICY_URL: 'https://ttenergyapp.blogspot.com/p/privacy-policy-tt-energy-app.html',
+  TERMS_URL: 'https://ttenergyapp.blogspot.com/p/terms-conditions-tt-energy.html',
 };
 
 export const ENV = isDev ? dev : prod;

@@ -19,12 +19,12 @@ try {
   console.log('Google Mobile Ads not available (Expo Go)');
 }
 
-// Use test ad unit ID
+// Use test ad unit ID in dev, real IDs from env in production
 const adUnitId = __DEV__ && TestIds
   ? TestIds.BANNER
   : Platform.select({
-      ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy',
-      android: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy',
+      ios: process.env.EXPO_PUBLIC_ADMOB_BANNER_IOS ?? '',
+      android: process.env.EXPO_PUBLIC_ADMOB_BANNER_ANDROID ?? '',
     });
 
 export const BannerAd: React.FC = () => {

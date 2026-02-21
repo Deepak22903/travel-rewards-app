@@ -3,7 +3,7 @@
  * Landing page with logo image, icon buttons, and game-like aesthetic
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -18,8 +18,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
 import { ENV, APP_CONFIG } from '../core/constants/config';
-import { useInterstitialAd } from '../core/ads/useInterstitialAd';
-import { shouldShowInterstitial } from '../core/ads/adConfig';
+
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -28,17 +27,6 @@ interface HomeScreenProps {
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
-
-  useEffect(() => {
-    const checkAndShowAd = async () => {
-      if (adLoaded && await shouldShowInterstitial()) {
-        showInterstitial();
-      }
-    };
-    checkAndShowAd();
-  }, [adLoaded, showInterstitial]);
-
   const handleShare = async (): Promise<void> => {
     try {
       const storeUrl = Platform.OS === 'ios' ? ENV.APP_STORE_URL : ENV.PLAY_STORE_URL;

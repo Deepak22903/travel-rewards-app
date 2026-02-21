@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { recordAdShown } from './adConfig';
 
 let InterstitialAd: any = null;
 let AdEventType: any = null;
@@ -19,13 +20,16 @@ try {
   console.log('Google Mobile Ads not available (Expo Go)');
 }
 
-// Use test ad unit ID
+// Use test ad unit ID in dev, real IDs from env in production
 const adUnitId = __DEV__ && TestIds
   ? TestIds.INTERSTITIAL
   : Platform.select({
-      ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy',
-      android: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy',
+      ios: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS ?? '',
+      android: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID ?? '',
     });
+
+const MAX_RETRIES = 3;
+let retryCount = 0;
 
 // Create interstitial ad instance only if module is available
 let interstitial: any = null;
@@ -53,8 +57,8 @@ export const useInterstitialAd = () => {
     const unsubscribeLoaded = interstitial.addAdEventListener(
       AdEventType.LOADED,
       () => {
+        retryCount = 0; // reset backoff on successful load
         setIsLoaded(true);
-        console.log('Interstitial ad loaded');
       }
     );
 
@@ -62,7 +66,7 @@ export const useInterstitialAd = () => {
       AdEventType.CLOSED,
       () => {
         setIsLoaded(false);
-        // Reload the ad
+        recordAdShown(); // timer resets only when ad actually closes
         interstitial.load();
       }
     );
@@ -72,6 +76,13 @@ export const useInterstitialAd = () => {
       (error: any) => {
         console.error('Interstitial ad error:', error);
         setIsLoaded(false);
+        // Retry with exponential backoff (5s, 10s, 15s)
+        if (retryCount < MAX_RETRIES) {
+          retryCount++;
+          setTimeout(() => {
+            try { interstitial.load(); } catch (_) {}
+          }, retryCount * 5000);
+        }
       }
     );
 

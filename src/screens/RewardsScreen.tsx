@@ -3,7 +3,7 @@
  * Displays daily game rewards grouped by date with brown header and styled cards
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -46,6 +46,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const [initialized, setInitialized] = useState(false);
 
   const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
+  const isFirstTap = useRef(true); // skip ad on the very first reward card tap
 
   const loadClaimedRewards = async (): Promise<void> => {
     try {
@@ -126,6 +127,10 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
 
   const handleRewardPress = useCallback((reward: Reward): void => {
     const showAd = async () => {
+      if (isFirstTap.current) {
+        isFirstTap.current = false; // first tap: skip ad, mark as done
+        return;
+      }
       if (adLoaded && await shouldShowInterstitial()) {
         showInterstitial();
       }
@@ -196,14 +201,11 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   ), []);
 
   const ListHeaderComponent = useCallback((): React.JSX.Element => (
-    <>
-      <View style={styles.infoBanner}>
-        <Text style={styles.infoBannerText}>
-          Rewards are valid for a few days. If they don't work, they may have expired or already been used on your account.
-        </Text>
-      </View>
-      <BannerAd />
-    </>
+    <View style={styles.infoBanner}>
+      <Text style={styles.infoBannerText}>
+        Rewards are valid for a few days. If they don't work, they may have expired or already been used on your account.
+      </Text>
+    </View>
   ), []);
 
   if (loading) {
@@ -288,6 +290,9 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
         stickySectionHeadersEnabled={false}
       />
 
+      {/* Sticky bottom banner — outside SectionList so it stays fixed */}
+      <BannerAd />
+
       {selectedReward && (
         <ClaimModal
           visible={modalVisible}
@@ -347,7 +352,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   listContent: {
-    paddingBottom: spacing.lg,
+    paddingBottom: 80, // space for sticky bottom banner
   },
   sectionHeaderContainer: {
     paddingHorizontal: spacing.md,

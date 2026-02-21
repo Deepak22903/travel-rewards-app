@@ -92,18 +92,19 @@ android {
         applicationId 'com.travelrewards.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 2
         versionName "1.3.1"
+        // AdMob App ID injected from gradle.properties (gitignored) at build time
+        manifestPlaceholders = [admobAppId: findProperty('ADMOB_APP_ID') ?: 'ca-app-pub-3940256099942544~3347511713']
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
     
-    // APK size optimization: Split by CPU architecture
+    // APK size optimization: Split by CPU architecture (APK only — AAB handles this automatically)
     splits {
         abi {
-            enable true
+            enable !gradle.startParameter.taskNames.any { it.contains("bundle") }
             reset()
-            // Only include modern architectures (drops x86/x86_64)
             include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             universalApk true
         }
