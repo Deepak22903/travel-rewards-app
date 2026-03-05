@@ -13,7 +13,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const TOKEN_REGISTERED_KEY = '@notification_token_registered';
 
 export const useNotifications = (
-  navigationRef: React.RefObject<NavigationContainerRef<RootStackParamList> | null>
+  navigationRef: React.RefObject<NavigationContainerRef<RootStackParamList> | null>,
+  onForegroundNotification?: (title: string, body: string, onPress: () => void) => void,
 ) => {
   const cleanupRef = useRef<(() => void) | null>(null);
 
@@ -72,7 +73,16 @@ export const useNotifications = (
       // Foreground notification received
       (notification) => {
         console.log('Foreground notification received:', notification);
-        // Optionally navigate immediately or show in-app notification
+        if (onForegroundNotification) {
+          const title = notification.notification?.title ?? '';
+          const body = notification.notification?.body ?? '';
+          const onPress = () => {
+            if (navigationRef.current?.isReady()) {
+              navigationRef.current.navigate('Rewards', { fromNotification: Date.now() });
+            }
+          };
+          onForegroundNotification(title, body, onPress);
+        }
       },
       // Notification opened (background or quit state)
       (notification) => {
