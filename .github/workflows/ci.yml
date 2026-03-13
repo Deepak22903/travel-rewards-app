@@ -3,10 +3,7 @@
 name: Travel Rewards App CI/CD
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+  workflow_dispatch:
 
 jobs:
   # Job 1: Lint and Test
