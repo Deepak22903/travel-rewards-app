@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 import { NavigationContainerRef } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { registerPushToken } from '../api/notifications';
-import { setupFCMListeners } from './firebase';
+import { checkNotificationPermissionStatus, setupFCMListeners } from './firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TOKEN_REGISTERED_KEY = '@notification_token_registered';
@@ -22,6 +22,11 @@ export const useNotifications = (
     // Register token on app start (if not already registered)
     const registerToken = async () => {
       try {
+        const permissionStatus = await checkNotificationPermissionStatus();
+        if (permissionStatus !== 'granted') {
+          return;
+        }
+
         const alreadyRegistered = await AsyncStorage.getItem(TOKEN_REGISTERED_KEY);
         
         if (!alreadyRegistered) {
@@ -43,7 +48,11 @@ export const useNotifications = (
       console.log('Handling notification navigation:', notification);
       
       // Get target screen from notification data (default to Rewards)
-      const screen = notification.data?.screen || 'Rewards';
+      const incomingScreen = notification.data?.screen;
+      const validScreens: Array<keyof RootStackParamList> = ['Home', 'Rewards', 'Settings'];
+      const screen: keyof RootStackParamList = validScreens.includes(incomingScreen)
+        ? incomingScreen
+        : 'Rewards';
       
       // Wait for navigation to be ready
       if (navigationRef.current?.isReady()) {

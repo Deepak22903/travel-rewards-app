@@ -3,7 +3,7 @@
  * Displays daily game rewards grouped by date with brown header and styled cards
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,6 @@ import { Reward, RewardSection, STORAGE_KEYS } from '../core/types';
 import { getRewards } from '../core/api/rewards';
 import { ClaimModal } from '../components/ClaimModal';
 import { BannerAd } from '../components/BannerAd';
-import { useInterstitialAd } from '../core/ads/useInterstitialAd';
-import { shouldShowInterstitial } from '../core/ads/adConfig';
 import { logError, logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useRoute, RouteProp } from '@react-navigation/native';
@@ -44,9 +42,6 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const [infoMessage, setInfoMessage] = useState<string>('');
   const [claimedRewards, setClaimedRewards] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
-
-  const { isLoaded: adLoaded, show: showInterstitial } = useInterstitialAd();
-  const isFirstTap = useRef(true); // skip ad on the very first reward card tap
 
   const loadClaimedRewards = async (): Promise<void> => {
     try {
@@ -126,20 +121,9 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   }, [fetchRewards]);
 
   const handleRewardPress = useCallback((reward: Reward): void => {
-    const showAd = async () => {
-      if (isFirstTap.current) {
-        isFirstTap.current = false; // first tap: skip ad, mark as done
-        return;
-      }
-      if (adLoaded && await shouldShowInterstitial()) {
-        showInterstitial();
-      }
-    };
-    showAd();
-
     setSelectedReward(reward);
     setModalVisible(true);
-  }, [adLoaded, showInterstitial]);
+  }, []);
 
   const handleClaimReward = useCallback((reward: Reward): void => {
     if (!reward.claimed) {
@@ -352,7 +336,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   listContent: {
-    paddingBottom: 80, // space for sticky bottom banner
+    paddingBottom: 120, // space for sticky bottom ad container + label
   },
   sectionHeaderContainer: {
     paddingHorizontal: spacing.md,

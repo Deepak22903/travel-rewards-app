@@ -40,7 +40,7 @@ jest.mock('expo-notifications', () => ({
   scheduleNotificationAsync: jest.fn(() => Promise.resolve('notification-id')),
   cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
   setNotificationChannelAsync: jest.fn(() => Promise.resolve()),
-}));
+}), { virtual: true });
 
 // Mock React Native AdMob (commented out - not installed yet)
 // jest.mock('react-native-google-mobile-ads', () => ({

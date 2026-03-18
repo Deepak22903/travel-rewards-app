@@ -20,6 +20,7 @@
     "production": {
       "android": {
         "buildType": "app-bundle",
+        "autoIncrement": "versionCode",
         "env": {
           "EXPO_OPTIMIZE_IMAGES": "1"
         }

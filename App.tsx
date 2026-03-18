@@ -20,17 +20,31 @@ import {
 } from './src/core/notifications/firebase';
 import { registerPushToken } from './src/core/api/notifications';
 import { STORAGE_KEYS } from './src/core/types';
+import { initializeFamilySafeAds } from './src/core/ads/adConfig';
 
 export default function App(): React.JSX.Element {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [showPermModal, setShowPermModal] = useState(false);
 
   useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync(customFonts);
-      setFontsLoaded(true);
+    async function initializeApp() {
+      try {
+        await initializeFamilySafeAds();
+      } catch (error) {
+        console.error('Ads initialization failed:', error);
+      }
+
+      try {
+        await Font.loadAsync(customFonts);
+      } catch (error) {
+        // Never block app startup on font load failures.
+        console.error('Font loading failed, continuing with system fonts:', error);
+      } finally {
+        setFontsLoaded(true);
+      }
     }
-    loadFonts();
+
+    initializeApp();
   }, []);
 
   useEffect(() => {
@@ -70,28 +84,37 @@ export default function App(): React.JSX.Element {
 
   // User tapped "Allow" in the in-app rationale modal
   const handlePermAllow = async () => {
-    setShowPermModal(false);
-    // OS dialog now appears cleanly with no competing backdrop
-    const granted = await requestFCMPermissions();
-    if (__DEV__) console.log('Notification permission granted:', granted);
-    // Register token regardless — notifications_enabled flag tells backend the state
-    const token = await getFCMToken();
-    if (token) {
-      const registered = await registerPushToken(granted);
-      if (registered && __DEV__) console.log('✅ FCM token registered with backend');
+    try {
+      setShowPermModal(false);
+      // OS dialog now appears cleanly with no competing backdrop
+      const granted = await requestFCMPermissions();
+      if (__DEV__) console.log('Notification permission granted:', granted);
+      // Register token regardless — notifications_enabled flag tells backend the state
+      const token = await getFCMToken();
+      if (token) {
+        const registered = await registerPushToken(granted);
+        if (registered && __DEV__) console.log('✅ FCM token registered with backend');
+      }
+      await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, granted ? 'true' : 'false');
+    } catch (error) {
+      console.error('Error enabling notifications:', error);
+      await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'false');
     }
-    await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, granted ? 'true' : 'false');
   };
 
   // User tapped "Not now" in the in-app rationale modal
   const handlePermNotNow = async () => {
-    setShowPermModal(false);
-    // Mark as denied so modal shows again next launch (per spec: until granted or blocked)
-    await AsyncStorage.setItem(PERM_STATUS_KEY, 'denied');
-    await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'false');
-    // Still register token with disabled flag so backend has the device record
-    const token = await getFCMToken();
-    if (token) await registerPushToken(false);
+    try {
+      setShowPermModal(false);
+      // Mark as denied so modal shows again next launch (per spec: until granted or blocked)
+      await AsyncStorage.setItem(PERM_STATUS_KEY, 'denied');
+      await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'false');
+      // Still register token with disabled flag so backend has the device record
+      const token = await getFCMToken();
+      if (token) await registerPushToken(false);
+    } catch (error) {
+      console.error('Error handling notification denial:', error);
+    }
   };
 
   if (!fontsLoaded) {

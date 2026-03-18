@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { colors, borderRadius, spacing, typography } from '../core/constants/theme';
 
 let GoogleBannerAd: any = null;
 let BannerAdSize: any = null;
@@ -29,23 +30,36 @@ const adUnitId = __DEV__ && TestIds
 
 export const BannerAd: React.FC = () => {
   // If native module not available, show placeholder
-  if (!GoogleBannerAd) {
+  if (!GoogleBannerAd || !adUnitId) {
     return (
-      <View style={styles.mockBanner}>
-        {/* Mock banner - native module not available */}
+      <View style={styles.container}>
+        <View style={styles.adShell}>
+          <Text style={styles.adLabel}>Advertisement</Text>
+          <View style={styles.mockBanner}>
+            {/* Mock banner - native module not available */}
+          </View>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <GoogleBannerAd
-        unitId={adUnitId!}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        requestOptions={{
-          requestNonPersonalizedAdsOnly: true,
-        }}
-      />
+      <View style={styles.adShell}>
+        <Text style={styles.adLabel}>Advertisement</Text>
+        <GoogleBannerAd
+          unitId={adUnitId!}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+          }}
+          onAdFailedToLoad={(error: any) => {
+            if (__DEV__) {
+              console.log('Banner ad failed to load:', error);
+            }
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -53,7 +67,30 @@ export const BannerAd: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.background,
+  },
+  adShell: {
+    width: '100%',
+    maxWidth: 480,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.backgroundLight,
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+  },
+  adLabel: {
+    alignSelf: 'flex-start',
+    marginLeft: spacing.sm,
+    marginBottom: spacing.xs,
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
+    fontFamily: typography.family.semibold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   mockBanner: {
     height: 50,

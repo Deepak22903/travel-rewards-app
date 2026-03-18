@@ -92,8 +92,8 @@ android {
         applicationId 'com.travelrewards.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10
-        versionName "1.3.7"
+        versionCode 13
+        versionName "1.3.10"
         // AdMob App ID injected from gradle.properties (gitignored) at build time
         manifestPlaceholders = [admobAppId: findProperty('ADMOB_APP_ID') ?: 'ca-app-pub-3940256099942544~3347511713']
 
@@ -105,7 +105,7 @@ android {
         abi {
             enable !gradle.startParameter.taskNames.any { it.contains("bundle") }
             reset()
-            include 'armeabi-v7a', 'arm64-v8a' //, 'x86', 'x86_64'  // emulator-only, not needed for release
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             universalApk true
         }
     }
