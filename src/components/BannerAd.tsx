@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, borderRadius, spacing, typography } from '../core/constants/theme';
 
 let GoogleBannerAd: any = null;
@@ -29,10 +30,12 @@ const adUnitId = __DEV__ && TestIds
     });
 
 export const BannerAd: React.FC = () => {
+  const insets = useSafeAreaInsets();
+
   // If native module not available, show placeholder
   if (!GoogleBannerAd || !adUnitId) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: spacing.sm + insets.bottom }] }>
         <View style={styles.adShell}>
           <Text style={styles.adLabel}>Advertisement</Text>
           <View style={styles.mockBanner}>
@@ -44,7 +47,7 @@ export const BannerAd: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: spacing.sm + insets.bottom }] }>
       <View style={styles.adShell}>
         <Text style={styles.adLabel}>Advertisement</Text>
         <GoogleBannerAd
@@ -81,6 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundLight,
     alignItems: 'center',
     paddingVertical: spacing.sm,
+    overflow: 'hidden',
   },
   adLabel: {
     alignSelf: 'flex-start',

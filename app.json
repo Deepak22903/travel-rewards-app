@@ -2,7 +2,7 @@
   "expo": {
     "name": "TT Energy - Reward Links",
     "slug": "travel-rewards-app",
-    "version": "1.3.10",
+    "version": "1.3.11",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -44,6 +44,14 @@
     },
     "plugins": [
       "expo-font",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-1430101085831484~2485132182",
+          "iosAppId": "ca-app-pub-1430101085831484~2485132182",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+        }
+      ],
       "@react-native-firebase/app",
       [
         "@react-native-firebase/messaging",

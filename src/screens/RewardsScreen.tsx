@@ -3,7 +3,7 @@
  * Displays daily game rewards grouped by date with brown header and styled cards
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { Reward, RewardSection, STORAGE_KEYS } from '../core/types';
 import { getRewards } from '../core/api/rewards';
 import { ClaimModal } from '../components/ClaimModal';
 import { BannerAd } from '../components/BannerAd';
+import { useInterstitialAd } from '../core/ads/useInterstitialAd';
 import { logError, logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useRoute, RouteProp } from '@react-navigation/native';
@@ -33,6 +34,7 @@ interface RewardsScreenProps {
 
 export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, 'Rewards'>>();
+  const { show } = useInterstitialAd();
   const [sections, setSections] = useState<RewardSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,6 +44,16 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const [infoMessage, setInfoMessage] = useState<string>('');
   const [claimedRewards, setClaimedRewards] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
+  const rewardInteractionCountRef = useRef(0);
+
+  const trackRewardInteractionAndMaybeShowAd = useCallback((): void => {
+    rewardInteractionCountRef.current += 1;
+
+    // Strict alternation: no ad on 1st click, show on 2nd, then alternate.
+    if (rewardInteractionCountRef.current % 2 === 0) {
+      show();
+    }
+  }, [show]);
 
   const loadClaimedRewards = async (): Promise<void> => {
     try {
@@ -121,9 +133,10 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   }, [fetchRewards]);
 
   const handleRewardPress = useCallback((reward: Reward): void => {
+    trackRewardInteractionAndMaybeShowAd();
     setSelectedReward(reward);
     setModalVisible(true);
-  }, []);
+  }, [trackRewardInteractionAndMaybeShowAd]);
 
   const handleClaimReward = useCallback((reward: Reward): void => {
     if (!reward.claimed) {
@@ -274,8 +287,10 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
         stickySectionHeadersEnabled={false}
       />
 
-      {/* Sticky bottom banner — outside SectionList so it stays fixed */}
-      <BannerAd />
+      {/* Sticky bottom banner */}
+      <View style={styles.bottomBannerContainer}>
+        <BannerAd />
+      </View>
 
       {selectedReward && (
         <ClaimModal
@@ -336,7 +351,14 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   listContent: {
-    paddingBottom: 120, // space for sticky bottom ad container + label
+    // Keep content above the fixed bottom ad area
+    paddingBottom: 170,
+  },
+  bottomBannerContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   sectionHeaderContainer: {
     paddingHorizontal: spacing.md,
