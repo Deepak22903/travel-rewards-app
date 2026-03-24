@@ -1,6 +1,7 @@
 /**
- * Settings Screen - Redesigned to Match Target App
- * App settings and information with brown header and styled cards
+ * Settings Screen
+ * App settings and information with styled cards
+ * All text content is now configurable via gameConfig.ts
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -29,6 +30,7 @@ import {
 } from '../core/notifications/firebase';
 import { registerPushToken, updatePushTokenState } from '../core/api/notifications';
 import { NotificationPermissionModal } from '../components';
+import { TEXT_CONFIG } from '../core/constants/gameConfig';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -164,17 +166,17 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         >
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={styles.headerTitle}>{TEXT_CONFIG.settings.screenTitle}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {/* Notifications Section */}
-        <Text style={styles.sectionHeader}>Notifications</Text>
+        <Text style={styles.sectionHeader}>{TEXT_CONFIG.settings.notificationsSectionTitle}</Text>
         <View style={styles.card}>
           <View style={styles.settingRow}>
-            <Text style={styles.iconLarge}>⚡</Text>
-            <Text style={styles.settingLabel}>New rewards</Text>
+            <Text style={styles.iconLarge}>{TEXT_CONFIG.settings.notificationsToggleIcon}</Text>
+            <Text style={styles.settingLabel}>{TEXT_CONFIG.settings.notificationsToggleLabel}</Text>
             <Switch
               value={notificationsEnabled}
               onValueChange={handleNotificationToggle}
@@ -240,12 +242,12 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
         {/* </View> */}
 
         {/* Information Section */}
-        <Text style={styles.sectionHeader}>Information</Text>
+        <Text style={styles.sectionHeader}>{TEXT_CONFIG.settings.informationSectionTitle}</Text>
         <View style={styles.card}>
           <View style={styles.versionRow}>
             <View style={styles.versionLeft}>
               <Text style={styles.iconSmall}>‹›</Text>
-              <Text style={styles.versionLabel}>Version</Text>
+              <Text style={styles.versionLabel}>{TEXT_CONFIG.settings.versionLabel}</Text>
             </View>
             <Text style={styles.versionNumber}>{APP_CONFIG.APP_VERSION}</Text>
           </View>
@@ -253,18 +255,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
           <View style={styles.divider} />
 
           <Text style={styles.disclaimerText}>
-            TT Energy - Reward Links is an independent application and is in no way affiliated with, endorsed, or approved by Magmatic Games LTD or Travel Town
+            {APP_CONFIG.DISCLAIMER}
           </Text>
         </View>
 
         {/* Privacy & Terms */}
         <View style={styles.linksContainer}>
           <TouchableOpacity onPress={() => handleOpenLink(ENV.PRIVACY_POLICY_URL)}>
-            <Text style={styles.linkText}>Privacy Policy</Text>
+            <Text style={styles.linkText}>{TEXT_CONFIG.settings.privacyPolicyLabel}</Text>
           </TouchableOpacity>
           <Text style={styles.linkSeparator}>•</Text>
           <TouchableOpacity onPress={() => handleOpenLink(ENV.TERMS_URL)}>
-            <Text style={styles.linkText}>Terms of Service</Text>
+            <Text style={styles.linkText}>{TEXT_CONFIG.settings.termsLabel}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -7,6 +7,7 @@ import client from './client';
 import { getFCMToken } from '../notifications/firebase';
 import { Platform } from 'react-native';
 import { APP_CONFIG } from '../constants/config';
+import { APP_INFO } from '../constants/gameConfig';
 
 interface TokenRegistrationResponse {
   success: boolean;
@@ -34,7 +35,7 @@ export const registerPushToken = async (notifications_enabled: boolean = true): 
         app_version: APP_CONFIG.APP_VERSION,
         token_type: 'fcm', // Specify this is an FCM token
         notifications_enabled: notifications_enabled,
-        app_id: 'travel_town', // Identifies this as a Travel Town app token for targeted push notifications
+        app_id: APP_INFO.id, // Game identifier from config (e.g., 'travel_town', 'monopoly_go')
       }
     );
 

@@ -1,13 +1,7 @@
 /**
  * InAppNotificationBanner
- * Slide-down animated banner for foreground push notifications.
- *
- * iOS and Android suppress system-tray banners when the app is foregrounded.
- * Firebase still delivers the message to the JS layer, so we render our own
- * in-app UI instead.
- *
- * Usage (imperative, via ref):
- *   bannerRef.current?.show(title, body, onPress)
+ * Slide-down animated banner for foreground push notifications
+ * All text content is now configurable via gameConfig.ts
  */
 
 import React, {
@@ -26,6 +20,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { borderRadius, colors, spacing, typography } from '../core/constants/theme';
+import { TEXT_CONFIG } from '../core/constants/gameConfig';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -94,7 +89,7 @@ export const InAppNotificationBanner = forwardRef<InAppNotificationBannerHandle>
 
         // FCM data-only messages may have no title/body — provide a fallback.
         setContent({
-          title: title?.trim() || 'New rewards available!',
+          title: title?.trim() || TEXT_CONFIG.inAppNotification.defaultTitle,
           body: body?.trim() || '',
           onPress,
         });
@@ -158,7 +153,7 @@ export const InAppNotificationBanner = forwardRef<InAppNotificationBannerHandle>
                 onPress={handleActionPress}
                 activeOpacity={0.8}
               >
-                <Text style={styles.actionText}>View Rewards</Text>
+                <Text style={styles.actionText}>{TEXT_CONFIG.inAppNotification.viewRewardsButton}</Text>
               </TouchableOpacity>
             )}
 
@@ -168,7 +163,7 @@ export const InAppNotificationBanner = forwardRef<InAppNotificationBannerHandle>
               onPress={slideOut}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Text style={styles.closeIcon}>✕</Text>
+              <Text style={styles.closeIcon}>{TEXT_CONFIG.inAppNotification.closeButton}</Text>
             </TouchableOpacity>
           </View>
         )}

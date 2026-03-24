@@ -1,6 +1,7 @@
 /**
- * Home Screen - Redesigned to Match Target App
+ * Home Screen
  * Landing page with logo image, icon buttons, and game-like aesthetic
+ * All text content is now configurable via gameConfig.ts
  */
 
 import React from 'react';
@@ -18,6 +19,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../core/types';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
 import { ENV, APP_CONFIG } from '../core/constants/config';
+import { TEXT_CONFIG, GAME_INFO } from '../core/constants/gameConfig';
 
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
@@ -80,8 +82,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           accessibilityLabel="View Rewards"
           accessibilityHint="Open rewards list"
         >
-          <Text style={styles.buttonIcon}>⚡</Text>
-          <Text style={styles.rewardsText}>Rewards</Text>
+          <Text style={styles.buttonIcon}>{GAME_INFO.primaryIcon}</Text>
+          <Text style={styles.rewardsText}>{TEXT_CONFIG.home.rewardsButton}</Text>
         </TouchableOpacity>
       </View>
 
@@ -98,7 +100,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             style={styles.actionIconImage}
             resizeMode="contain"
           />
-          <Text style={styles.actionText}>Share</Text>
+          <Text style={styles.actionText}>{TEXT_CONFIG.home.shareButton}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -112,7 +114,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             style={styles.actionIconImage}
             resizeMode="contain"
           />
-          <Text style={styles.actionText}>Rate</Text>
+          <Text style={styles.actionText}>{TEXT_CONFIG.home.rateButton}</Text>
         </TouchableOpacity>
       </View>
     </View>

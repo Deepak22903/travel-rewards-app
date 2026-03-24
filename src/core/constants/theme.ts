@@ -1,36 +1,18 @@
 /**
  * Design System - Theme Constants
- * Color palette and styling tokens for the Travel Rewards app
+ * Color palette and styling tokens
+ * 
+ * Colors are now imported from gameConfig.ts for easy customization.
+ * To change colors for a different game, edit gameConfig.ts instead.
  */
 
+import { THEME_CONFIG } from './gameConfig';
+
 export const colors = {
-  // Backgrounds
-  background: '#E8D4B8',       // Soft beige (target app)
-  backgroundLight: '#FFF9F0',  // Card white
+  // Game-specific colors from gameConfig
+  ...THEME_CONFIG.colors,
   
-  // Cards & Borders
-  card: '#FFF9F0',             // Off-white card background
-  cardBorder: '#D4A574',       // Brown borders
-  
-  // Text
-  textPrimary: '#6B3E26',      // Dark brown (target app)
-  textSecondary: '#8B7355',    // Medium brown
-  textLight: '#A69478',        // Light brown
-  textHeader: '#2C3E50',       // Navy section headers
-  
-  // Accent & Actions
-  accent: '#F5A623',           // Orange/gold
-  buttonGreen: '#4CAF50',      // Share button
-  buttonBlue: '#2196F3',       // Rate button
-  header: '#D4A574',           // Header bar
-  
-  // Status
-  success: '#4CAF50',
-  error: '#E53935',
-  warning: '#FFA726',
-  claimed: '#C8C8C8',          // Claimed/grayed state
-  
-  // Utility
+  // Utility colors (consistent across all games)
   white: '#FFFFFF',
   black: '#000000',
   transparent: 'transparent',

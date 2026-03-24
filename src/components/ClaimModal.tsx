@@ -1,6 +1,7 @@
 /**
  * Claim Modal Component
  * Modal for displaying reward details and claim functionality
+ * All text content is now configurable via gameConfig.ts
  */
 
 import React from 'react';
@@ -16,6 +17,7 @@ import {
 } from 'react-native';
 import { Reward } from '../core/types';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
+import { TEXT_CONFIG, REWARD_TYPES } from '../core/constants/gameConfig';
 
 interface ClaimModalProps {
   visible: boolean;
@@ -46,6 +48,9 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
 
   if (!reward) return null;
 
+  // Get icon from reward types config, fallback to reward.icon field
+  const rewardIcon = REWARD_TYPES[reward.icon]?.icon || reward.icon;
+
   return (
     <Modal
       visible={visible}
@@ -58,7 +63,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.rewardIcon}>
-              {reward.icon === 'energy' ? '⚡' : reward.icon === 'coins' ? '🪙' : '💎'}
+              {rewardIcon}
             </Text>
             <Text style={styles.title}>{reward.label}</Text>
           </View>
@@ -66,7 +71,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
           {/* Expired Warning */}
           {reward.expired && (
             <View style={styles.warningBanner}>
-              <Text style={styles.warningText}>⚠️ This reward may have expired</Text>
+              <Text style={styles.warningText}>{TEXT_CONFIG.claimModal.expiredWarning}</Text>
             </View>
           )}
 
@@ -77,7 +82,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
               onPress={onClose}
               activeOpacity={0.7}
             >
-              <Text style={styles.buttonText}>Close</Text>
+              <Text style={styles.buttonText}>{TEXT_CONFIG.claimModal.closeButton}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -85,8 +90,8 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ visible, reward, onClose
               onPress={handleClaim}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonIcon}>🎁</Text>
-              <Text style={[styles.buttonText, styles.claimButtonText]}>Claim</Text>
+              <Text style={styles.buttonIcon}>{TEXT_CONFIG.claimModal.claimButtonIcon}</Text>
+              <Text style={[styles.buttonText, styles.claimButtonText]}>{TEXT_CONFIG.claimModal.claimButton}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>

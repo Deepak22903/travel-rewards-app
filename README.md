@@ -1,6 +1,8 @@
-# 🎁 Travel Rewards App
+# 🎁 Game Rewards App Template
 
-A cross-platform React Native mobile application for displaying and claiming daily game rewards. Built with Expo, TypeScript, and designed with a warm, inviting theme.
+A configurable, cross-platform React Native template for building reward apps for different mobile games. Built with Expo, TypeScript, and designed for easy customization.
+
+**Current Configuration**: Travel Town Daily Rewards
 
 [![React Native](https://img.shields.io/badge/React%20Native-0.81.5-blue.svg)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-~54.0.33-000020.svg)](https://expo.dev/)
@@ -74,6 +76,54 @@ npx expo start --android
 npx expo start --web
 ```
 
+## 🎮 Using This Template
+
+This project is a **template system** - you can easily create similar reward apps for different mobile games!
+
+### Quick Template Usage
+
+```bash
+# 1. Edit configuration (single file!)
+nano src/core/constants/gameConfig.ts
+
+# 2. Validate your changes
+npm run validate
+
+# 3. Update build configuration
+npm run build:update
+
+# 4. Replace assets (icons, splash screens)
+# See ASSETS_GUIDE.md for specifications
+
+# 5. Start development
+npm start
+```
+
+### Complete Setup Guides
+
+- **[Template Guide](TEMPLATE_GUIDE.md)** - Step-by-step guide to create a new game app
+- **[Assets Guide](ASSETS_GUIDE.md)** - Detailed specifications for icons and images
+- **[Example Config](src/core/constants/gameConfig.example.ts)** - MONOPOLY GO! configuration example
+
+### Template Features
+
+- ✅ **Single config file** - All game-specific settings in `gameConfig.ts`
+- ✅ **No code changes needed** - Just edit configuration and replace assets
+- ✅ **Automatic validation** - Built-in checks for common mistakes
+- ✅ **Build scripts** - Automatically sync app.json with your config
+- ✅ **Complete documentation** - Guides for every step
+- ✅ **Working example** - See how to configure a different game
+
+### NPM Scripts for Template
+
+```bash
+npm run validate       # Validate gameConfig.ts
+npm run build:update   # Update app.json from config
+npm run build:game     # Validate + update (recommended)
+```
+
+---
+
 ## 📂 Project Structure
 
 ```
@@ -87,6 +137,10 @@ travel-rewards-app/
 │   │   ├── ads/            # AdMob configuration and hooks
 │   │   ├── api/            # API client and endpoints
 │   │   ├── constants/      # Theme, config, and app constants
+│   │   │   ├── gameConfig.ts         # ⭐ MAIN CONFIG FILE
+│   │   │   ├── gameConfig.example.ts # Example for different game
+│   │   │   ├── config.ts             # Imports from gameConfig
+│   │   │   └── theme.ts              # Theme from gameConfig
 │   │   ├── notifications/  # Push notification handling
 │   │   └── types/          # TypeScript type definitions
 │   ├── navigation/         # React Navigation setup
@@ -94,15 +148,20 @@ travel-rewards-app/
 │       ├── HomeScreen.tsx
 │       ├── RewardsScreen.tsx
 │       └── SettingsScreen.tsx
-├── assets/                 # Images, icons, splash screens
+├── assets/                 # Images, icons, splash screens (replace these!)
+├── scripts/                # Template build and validation scripts
+│   ├── validateConfig.js   # Validates gameConfig.ts
+│   └── buildGame.js        # Updates app.json from config
 ├── docs/                   # Documentation files
 │   ├── ADMOB_SETUP.md
 │   ├── APP_ICON_SETUP.md
 │   ├── NOTIFICATIONS_SETUP.md
 │   ├── PERFORMANCE.md
 │   └── TESTING_GUIDE.md
+├── TEMPLATE_GUIDE.md       # ⭐ How to create new game app
+├── ASSETS_GUIDE.md         # ⭐ Asset specifications
 ├── App.tsx                 # Root component
-├── app.json               # Expo configuration
+├── app.json               # Expo configuration (auto-updated)
 └── package.json           # Dependencies and scripts
 ```
 
@@ -130,7 +189,22 @@ travel-rewards-app/
 
 ## 🎨 Design System
 
-### Color Palette
+### Theme Customization
+
+All colors, text, and branding are configured in `src/core/constants/gameConfig.ts`:
+
+```typescript
+// Example: Travel Town theme (current)
+THEME_COLORS: {
+  background: '#F5E6D3',     // Warm beige
+  primary: '#F5A623',        // Golden orange
+  text: '#5D4E37',           // Dark brown
+}
+
+// Can be changed to any game theme!
+```
+
+### Default Colors (Travel Town)
 - **Background**: #F5E6D3 (Warm beige)
 - **Accent**: #F5A623 (Golden orange)
 - **Text Primary**: #5D4E37 (Dark brown)
@@ -138,12 +212,21 @@ travel-rewards-app/
 - **Success**: #4CAF50 (Green)
 
 ### Typography
+- **Font Family**: Fredoka (Google Fonts)
 - **Font Sizes**: 12px - 48px
 - **Font Weights**: 400, 500, 600, 700
 
 ## 📖 Documentation
 
-Comprehensive guides available in the [`docs/`](docs/) directory:
+### Template Documentation (Start Here!)
+
+- **[Template Guide](TEMPLATE_GUIDE.md)** ⭐ - Complete guide to creating a new game app
+- **[Assets Guide](ASSETS_GUIDE.md)** ⭐ - Specifications for icons and splash screens
+- **[Example Config](src/core/constants/gameConfig.example.ts)** - MONOPOLY GO! configuration
+
+### Technical Documentation
+
+Comprehensive technical guides available in the [`docs/`](docs/) directory:
 
 - **[AdMob Setup Guide](docs/ADMOB_SETUP.md)** - Complete AdMob integration instructions
 - **[App Icon Setup](docs/APP_ICON_SETUP.md)** - Icon and splash screen creation
@@ -212,23 +295,33 @@ See [Phase 9 documentation](ImplementationPlan.md#phase-9-store-submission) for 
 
 ## 🔧 Configuration
 
+### Game-Specific Configuration
+
+**All game-specific settings are in ONE file**: `src/core/constants/gameConfig.ts`
+
+This includes:
+- App name, version, and bundle identifiers
+- Game name, company, and branding
+- Theme colors (all UI colors)
+- Reward types (names and icons)
+- All UI text and messages
+- External URLs (privacy, terms, app stores)
+- AdMob app IDs
+- Firebase configuration
+- Backend API settings
+
+**To create a new game app**: See [TEMPLATE_GUIDE.md](TEMPLATE_GUIDE.md)
+
+### Legacy Configuration Files
+
+These files now import from `gameConfig.ts`:
+- `src/core/constants/config.ts` - App configuration
+- `src/core/constants/theme.ts` - Theme colors
+- `src/core/ads/adConfig.ts` - AdMob configuration
+
 ### Environment Variables
-Configure in `src/core/constants/config.ts`:
-- API_BASE_URL
-- APP_STORE_URL
-- PLAY_STORE_URL
-- ADMOB_APP_ID
 
-### AdMob Setup
-1. Create AdMob account
-2. Generate app and ad unit IDs
-3. Update `src/core/ads/adConfig.ts`
-4. See [docs/ADMOB_SETUP.md](docs/ADMOB_SETUP.md) for details
-
-### Notifications Setup
-1. Configure Firebase project (for production)
-2. Update `app.json` with notification settings
-3. See [docs/NOTIFICATIONS_SETUP.md](docs/NOTIFICATIONS_SETUP.md) for details
+No environment variables needed! Everything is in `gameConfig.ts`.
 
 ## 📊 Features Status
 
@@ -304,14 +397,23 @@ For questions or issues:
 
 ## 🔮 Future Enhancements
 
+### App Features
 - [ ] Multi-language support
 - [ ] Dark mode theme
 - [ ] Advanced analytics
 - [ ] Rewarded video ads
 - [ ] User accounts & authentication
 - [ ] Cross-promotion with other apps
-- [ ] Backend API integration
+
+### Template System
+- [ ] CLI tool for interactive configuration
+- [ ] Asset generator/optimizer
+- [ ] Automated testing for configurations
+- [ ] More game examples
+- [ ] Plugin system for custom features
 
 ---
 
 **Built with ❤️ using React Native & Expo**
+
+**Template System**: Create reward apps for any mobile game in minutes!

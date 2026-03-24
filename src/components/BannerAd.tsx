@@ -54,7 +54,9 @@ export const BannerAd: React.FC = () => {
           unitId={adUnitId!}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
           requestOptions={{
-            requestNonPersonalizedAdsOnly: true,
+            // Enable personalized ads for Teen (13+) audience to maximize revenue
+            // Set to false to allow targeted advertising
+            requestNonPersonalizedAdsOnly: false,
           }}
           onAdFailedToLoad={(error: any) => {
             if (__DEV__) {

@@ -1,7 +1,12 @@
 /**
  * App Configuration
  * Environment-specific settings and constants
+ * 
+ * This file now imports from gameConfig.ts for game-specific values.
+ * To customize for a different game, edit gameConfig.ts instead of this file.
  */
+
+import { gameConfig, APP_INFO, URL_CONFIG, SOCIAL_CONFIG, TEXT_CONFIG } from './gameConfig';
 
 // Detect development mode
 const isDev = __DEV__;
@@ -16,28 +21,28 @@ interface Environment {
 }
 
 const dev: Environment = {
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
-  APP_STORE_URL: 'https://apps.apple.com/app/id123456789', // TODO: Replace with real App Store URL after listing is created
-  PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=com.travelrewards.app',
+  API_BASE_URL: gameConfig.api.baseUrl,
+  APP_STORE_URL: URL_CONFIG.appStore,
+  PLAY_STORE_URL: URL_CONFIG.playStore,
   ADMOB_APP_ID: process.env.EXPO_PUBLIC_ADMOB_APP_ID_DEV ?? 'ca-app-pub-3940256099942544~3347511713',
-  PRIVACY_POLICY_URL: 'https://ttenergyapp.blogspot.com/p/privacy-policy-tt-energy-app.html',
-  TERMS_URL: 'https://ttenergyapp.blogspot.com/p/terms-conditions-tt-energy.html',
+  PRIVACY_POLICY_URL: URL_CONFIG.privacyPolicy,
+  TERMS_URL: URL_CONFIG.terms,
 };
 
 const prod: Environment = {
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
-  APP_STORE_URL: 'https://apps.apple.com/app/id123456789', // TODO: Replace with real App Store URL after listing is created
-  PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=com.travelrewards.app',
+  API_BASE_URL: gameConfig.api.baseUrl,
+  APP_STORE_URL: URL_CONFIG.appStore,
+  PLAY_STORE_URL: URL_CONFIG.playStore,
   ADMOB_APP_ID: process.env.EXPO_PUBLIC_ADMOB_APP_ID_PROD ?? '',
-  PRIVACY_POLICY_URL: 'https://ttenergyapp.blogspot.com/p/privacy-policy-tt-energy-app.html',
-  TERMS_URL: 'https://ttenergyapp.blogspot.com/p/terms-conditions-tt-energy.html',
+  PRIVACY_POLICY_URL: URL_CONFIG.privacyPolicy,
+  TERMS_URL: URL_CONFIG.terms,
 };
 
 export const ENV = isDev ? dev : prod;
 
 export const APP_CONFIG = {
-  APP_NAME: 'TT Energy - Reward Links',
-  APP_VERSION: '1.3.1',
-  SHARE_MESSAGE: 'Check out TT Energy - Reward Links app for daily game rewards!',
-  DISCLAIMER: 'TT Energy - Reward Links is an independent application and is in no way affiliated with, endorsed, or approved by Magmatic Games LTD or Travel Town',
+  APP_NAME: APP_INFO.name,
+  APP_VERSION: APP_INFO.version,
+  SHARE_MESSAGE: SOCIAL_CONFIG.shareMessage,
+  DISCLAIMER: TEXT_CONFIG.settings.disclaimer,
 };

@@ -36,7 +36,8 @@ let interstitial: any = null;
 if (InterstitialAd && adUnitId) {
   try {
     interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-      requestNonPersonalizedAdsOnly: true,
+      // Enable personalized ads for Teen (13+) audience to maximize revenue
+      requestNonPersonalizedAdsOnly: false,
     });
   } catch (e) {
     console.log('Failed to create interstitial ad:', e);

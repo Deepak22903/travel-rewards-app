@@ -1,6 +1,6 @@
 {
   "name": "travel-rewards-app",
-  "version": "1.0.0",
+  "version": "1.3.12",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -12,7 +12,10 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "build:android:release": "cd android && ./gradlew assembleRelease",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "validate": "node scripts/validateConfig.js",
+    "build:update": "node scripts/buildGame.js",
+    "build:game": "npm run validate && npm run build:update"
   },
   "dependencies": {
     "@expo-google-fonts/fredoka": "^0.4.1",

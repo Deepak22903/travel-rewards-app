@@ -1,7 +1,7 @@
 /**
  * Notification Permission Modal
- * In-app rationale shown before the OS permission dialog.
- * Shown every launch until the user grants or the OS permanently blocks.
+ * In-app rationale shown before the OS permission dialog
+ * All text content is now configurable via gameConfig.ts
  */
 
 import React from 'react';
@@ -14,6 +14,7 @@ import {
   Pressable,
 } from 'react-native';
 import { colors, spacing, typography, borderRadius, shadows } from '../core/constants/theme';
+import { TEXT_CONFIG } from '../core/constants/gameConfig';
 
 interface NotificationPermissionModalProps {
   visible: boolean;
@@ -41,13 +42,11 @@ export const NotificationPermissionModal: React.FC<NotificationPermissionModalPr
           </View>
 
           {/* Title */}
-          <Text style={styles.title}>Don't Miss Out!</Text>
+          <Text style={styles.title}>{TEXT_CONFIG.notificationPermission.modalTitle}</Text>
 
           {/* Body */}
           <Text style={styles.body}>
-            Get instant alerts when new daily rewards drop — free energy, coins and gems.
-            {'\n\n'}
-            Be the first to claim before they expire.
+            {TEXT_CONFIG.notificationPermission.modalBody}
           </Text>
 
           {/* Allow button */}
@@ -56,7 +55,7 @@ export const NotificationPermissionModal: React.FC<NotificationPermissionModalPr
             onPress={onAllow}
             activeOpacity={0.85}
           >
-            <Text style={styles.allowText}>Allow Notifications</Text>
+            <Text style={styles.allowText}>{TEXT_CONFIG.notificationPermission.allowButton}</Text>
           </TouchableOpacity>
 
           {/* Not now */}
@@ -65,7 +64,7 @@ export const NotificationPermissionModal: React.FC<NotificationPermissionModalPr
             onPress={onNotNow}
             activeOpacity={0.6}
           >
-            <Text style={styles.notNowText}>Not now</Text>
+            <Text style={styles.notNowText}>{TEXT_CONFIG.notificationPermission.dismissButton}</Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>

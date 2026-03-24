@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, typography, spacing } from '../core/constants/theme';
+import { TEXT_CONFIG } from '../core/constants/gameConfig';
 
 interface Props {
   children: ReactNode;
@@ -59,10 +60,10 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <View style={styles.container}>
           <View style={styles.content}>
-            <Text style={styles.emoji}>😕</Text>
-            <Text style={styles.title}>Oops! Something went wrong</Text>
+            <Text style={styles.emoji}>{TEXT_CONFIG.errorBoundary.emoji}</Text>
+            <Text style={styles.title}>{TEXT_CONFIG.errorBoundary.title}</Text>
             <Text style={styles.message}>
-              We're sorry for the inconvenience. The app encountered an unexpected error.
+              {TEXT_CONFIG.errorBoundary.message}
             </Text>
             
             {__DEV__ && this.state.error && (
@@ -82,7 +83,7 @@ export class ErrorBoundary extends Component<Props, State> {
               onPress={this.handleReset}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Try Again</Text>
+              <Text style={styles.buttonText}>{TEXT_CONFIG.errorBoundary.retryButton}</Text>
             </TouchableOpacity>
           </View>
         </View>

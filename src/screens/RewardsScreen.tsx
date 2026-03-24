@@ -1,6 +1,7 @@
 /**
- * Rewards Screen - Redesigned to Match Target App
- * Displays daily game rewards grouped by date with brown header and styled cards
+ * Rewards Screen
+ * Displays daily game rewards grouped by date with styled cards
+ * All text content is now configurable via gameConfig.ts
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -25,6 +26,7 @@ import { logError, logStorageError } from '../core/utils/errorLogger';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../core/types';
+import { TEXT_CONFIG, GAME_INFO } from '../core/constants/gameConfig';
 
 type RewardsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Rewards'>;
 
@@ -173,7 +175,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
       accessibilityHint="Tap to claim this reward"
     >
       <View style={styles.cardContent}>
-        <Text style={styles.rewardIcon}>⚡</Text>
+        <Text style={styles.rewardIcon}>{GAME_INFO.primaryIcon}</Text>
         <Text style={[styles.rewardLabel, item.claimed && styles.textClaimed]}>
           {item.label}
         </Text>
@@ -200,7 +202,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
   const ListHeaderComponent = useCallback((): React.JSX.Element => (
     <View style={styles.infoBanner}>
       <Text style={styles.infoBannerText}>
-        Rewards are valid for a few days. If they don't work, they may have expired or already been used on your account.
+        {TEXT_CONFIG.rewards.infoBanner}
       </Text>
     </View>
   ), []);
@@ -216,13 +218,13 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
           >
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Rewards</Text>
+          <Text style={styles.headerTitle}>{TEXT_CONFIG.rewards.screenTitle}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={colors.accent} />
-          <Text style={styles.loadingText}>Loading rewards...</Text>
+          <Text style={styles.loadingText}>{TEXT_CONFIG.rewards.loadingRewards}</Text>
         </View>
       </View>
     );
@@ -239,13 +241,13 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
           >
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Rewards</Text>
+          <Text style={styles.headerTitle}>{TEXT_CONFIG.rewards.screenTitle}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         <View style={styles.centerContainer}>
           <Text style={styles.errorEmoji}>🔌</Text>
-          <Text style={styles.errorTitle}>Connection Error</Text>
+          <Text style={styles.errorTitle}>{TEXT_CONFIG.rewards.connectionError}</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
             <Text style={styles.retryText}>Try Again</Text>
@@ -265,7 +267,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
         >
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rewards</Text>
+        <Text style={styles.headerTitle}>{TEXT_CONFIG.rewards.screenTitle}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -287,8 +289,12 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
         stickySectionHeadersEnabled={false}
       />
 
-      {/* Sticky bottom banner */}
+      {/* Sticky bottom banner with clear separation from content */}
       <View style={styles.bottomBannerContainer}>
+        {/* Ad disclosure separator - prevents accidental clicks */}
+        <View style={styles.adSeparator}>
+          <View style={styles.adSeparatorLine} />
+        </View>
         <BannerAd />
       </View>
 
@@ -360,6 +366,16 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  adSeparator: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    backgroundColor: colors.background,
+  },
+  adSeparatorLine: {
+    height: 1,
+    backgroundColor: colors.cardBorder,
+    opacity: 0.3,
+  },
   sectionHeaderContainer: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.lg,
@@ -413,9 +429,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // actionIconClaimed: {
-  //   backgroundColor: colors.backgroundLight,
-  // },
+  actionIconClaimed: {
+    backgroundColor: colors.backgroundLight,
+  },
   actionIconImage: {
     width: 24,
     height: 24,
