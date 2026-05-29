@@ -59,6 +59,8 @@ export interface GameConfig {
     androidAppId: string;
     /** Google AdMob App ID for iOS */
     iosAppId: string;
+    /** Full-screen ad type used across the app */
+    fullScreenAdType: 'interstitial' | 'rewarded';
   };
 
   // Firebase Configuration
@@ -235,6 +237,7 @@ export const gameConfig: GameConfig = {
   admob: {
     androidAppId: 'ca-app-pub-1430101085831484~2485132182',
     iosAppId: 'ca-app-pub-1430101085831484~2485132182',
+    fullScreenAdType: 'rewarded',
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -380,6 +383,7 @@ export const APP_INFO = gameConfig.app;
 export const GAME_INFO = gameConfig.game;
 export const API_CONFIG = gameConfig.api;
 export const ADMOB_CONFIG = gameConfig.admob;
+export const FULL_SCREEN_AD_TYPE = gameConfig.admob.fullScreenAdType;
 export const FIREBASE_CONFIG = gameConfig.firebase;
 export const THEME_CONFIG = gameConfig.theme;
 export const REWARD_TYPES = gameConfig.rewards;
